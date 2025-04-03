@@ -81,22 +81,22 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (currentSession && !currentSession.endTime) {
       const startTime = new Date(currentSession.startTime).getTime();
-      
+
       const updateElapsedTime = () => {
         const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
-        
+
         setElapsedTime({ hours, minutes, seconds });
       };
-      
+
       // Set initial elapsed time
       updateElapsedTime();
-      
+
       // Start timer
       timerRef.current = setInterval(updateElapsedTime, 1000);
-      
+
       return () => {
         if (timerRef.current) {
           clearInterval(timerRef.current);

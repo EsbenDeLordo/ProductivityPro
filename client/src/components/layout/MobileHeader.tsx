@@ -26,6 +26,8 @@ export default function MobileHeader({ user }: MobileHeaderProps) {
         return "AI Assistant";
       case "/recommendations":
         return "Recommendations";
+      case "/content-tools":
+        return "Content Tools";
       default:
         return "Pocket Huberman Pro";
     }

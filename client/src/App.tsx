@@ -8,6 +8,7 @@ import Projects from "@/pages/Projects";
 import Analytics from "@/pages/Analytics";
 import Assistant from "@/pages/Assistant";
 import Recommendations from "@/pages/Recommendations";
+import ContentTools from "@/pages/ContentTools";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import { useState, useEffect } from "react";
@@ -18,7 +19,8 @@ function App() {
     username: "demo",
     name: "Andrew Huberman",
     email: "andrew@hubermanlab.com",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces",
+    password: "password123" // Adding password to satisfy TypeScript type requirements
   });
 
   useEffect(() => {
@@ -40,6 +42,7 @@ function App() {
               <Route path="/analytics" component={Analytics} />
               <Route path="/assistant" component={Assistant} />
               <Route path="/recommendations" component={Recommendations} />
+              <Route path="/content-tools" component={ContentTools} />
               <Route component={NotFound} />
             </Switch>
           </main>

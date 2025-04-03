@@ -17,7 +17,8 @@ export default function Sidebar({ user }: SidebarProps) {
     { path: "/projects", label: "Projects", icon: "folder" },
     { path: "/analytics", label: "Analytics", icon: "analytics" },
     { path: "/assistant", label: "AI Assistant", icon: "smart_toy" },
-    { path: "/recommendations", label: "Recommendations", icon: "lightbulb" }
+    { path: "/recommendations", label: "Recommendations", icon: "lightbulb" },
+    { path: "/content-tools", label: "Content Tools", icon: "description" }
   ];
   
   // Get the most recent 3 projects

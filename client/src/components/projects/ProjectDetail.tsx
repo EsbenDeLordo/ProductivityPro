@@ -157,7 +157,25 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
 
   // Handle progress update
   const handleProgressUpdate = () => {
-    updateProjectMutation.mutate({ progress });
+    if (project?.id) {
+      updateProjectMutation.mutate({
+        id: project.id,
+        progress: progress
+      });
+    }
+  };
+
+  const formatTimeWithSeconds = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    
+    const parts = [];
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (remainingSeconds > 0 || parts.length === 0) parts.push(`${remainingSeconds}s`);
+    
+    return parts.join(' ');
   };
 
   // Handle message sending
@@ -262,7 +280,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Time Logged</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{formatTimeLogged(project.timeLogged)}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{formatTimeWithSeconds(project.timeLogged)}</p>
                     </div>
                   </div>
                 </CardContent>

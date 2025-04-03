@@ -736,10 +736,9 @@ export class DatabaseStorage implements IStorage {
       throw new Error(`Work session with id ${id} not found`);
     }
 
-    const endTime = new Date();
+    const endTime = new Date().toISOString();
     const startTime = new Date(session.startTime);
-    const durationInSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
-    const durationInMinutes = durationInSeconds / 60;
+    const durationInSeconds = Math.floor((new Date(endTime).getTime() - startTime.getTime()) / 1000);
 
     // Update the session
     const [updatedSession] = await db
@@ -751,13 +750,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(workSessions.id, id))
       .returning();
 
-    // Update the project's total time logged
+    // Update the project's total time logged (store as seconds)
     if (session.projectId) {
       const [project] = await db.select().from(projects).where(eq(projects.id, session.projectId)).limit(1);
       if (project) {
-        const newTimeLogged = (project.timeLogged || 0) + durationInMinutes;
+        const newTimeLogged = (project.timeLogged || 0) + durationInSeconds;
         await this.updateProject(session.projectId, { 
-          timeLogged: Math.round(newTimeLogged * 100) / 100 
+          timeLogged: Math.floor(newTimeLogged)
         });
       }
     }

@@ -120,11 +120,13 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   const handleSessionToggle = async () => {
     try {
       if (isSessionActive && currentSession?.projectId === project.id) {
-        await endSession();
-        toast({
-          title: "Session ended",
-          description: "Your work session has been saved."
-        });
+        if (currentSession.id) {
+          await endSession();
+          toast({
+            title: "Session ended",
+            description: "Your work session has been saved."
+          });
+        }
       } else if (!isSessionActive) {
         await startSession(project.id, "focus");
         toast({
@@ -502,7 +504,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 className="w-full justify-start"
                 onClick={async () => {
                   try {
-                    await updateProject(project.id, {
+                    await updateProject({
                       name: project.name,
                       description: project.description,
                       type: project.type,

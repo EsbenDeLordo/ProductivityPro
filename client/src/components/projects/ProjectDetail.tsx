@@ -24,6 +24,33 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   const { currentSession, startSession, endSession, isSessionActive } = useWorkSession();
   const [activeTab, setActiveTab] = useState("overview");
   const [progress, setProgress] = useState(project.progress);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
+  // Project mutations
+  const createProjectMutation = useMutation({
+    mutationFn: (data: any) => 
+      fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => res.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+    }
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: (id: number) => 
+      fetch(`/api/project/${id}`, {
+        method: 'DELETE'
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+    }
+  });
+
+  const createProject = createProjectMutation.mutateAsync;
+  const deleteProject = (id: number) => deleteProjectMutation.mutateAsync(id);
 
   // Get template for this project type
   const { data: template } = useQuery<ProjectTemplate>({
@@ -87,19 +114,28 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
 
   // Handle session toggling
   const handleSessionToggle = async () => {
-    if (isSessionActive) {
-      // If there's an active session, end it
-      await endSession();
+    try {
+      if (isSessionActive) {
+        // If there's an active session, end it
+        await endSession();
+        toast({
+          title: "Session ended",
+          description: "Your work session has been saved."
+        });
+      } else {
+        // Start a new session for this project
+        await startSession(project.id, "focus");
+        toast({
+          title: "Session started",
+          description: "Your work session has begun."
+        });
+      }
+    } catch (error) {
+      console.error('Session error:', error);
       toast({
-        title: "Session ended",
-        description: "Your work session has been saved."
-      });
-    } else {
-      // Start a new session for this project
-      await startSession(project.id, "focus");
-      toast({
-        title: "Session started",
-        description: "Your work session has begun."
+        title: "Error",
+        description: "Failed to manage work session",
+        variant: "destructive"
       });
     }
   };

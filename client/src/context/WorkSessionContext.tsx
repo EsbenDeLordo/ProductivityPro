@@ -44,10 +44,12 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
   });
 
   const startSession = async (projectId: number | null, type: string) => {
+    // Convert to ISO string for API
+    const now = new Date();
     return startSessionMutation.mutateAsync({
       userId,
       projectId,
-      startTime: new Date(), //Corrected Date object instead of ISOString
+      startTime: now.toISOString(),
       type
     });
   };

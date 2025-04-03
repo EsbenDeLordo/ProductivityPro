@@ -217,7 +217,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 </CardContent>
               </Card>
               
-              {template && (
+              {template && template.sections && Array.isArray(template.sections) && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Project Sections</CardTitle>

@@ -503,11 +503,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
-                onClick={() => {
-                  if (!project) return;
-                  setEditingProject(project);
-                  setShowProjectModal(true);
-                }}
+                onClick={() => setIsProjectModalOpen(true)}
               >
                 <span className="material-icons mr-2">edit</span>
                 Edit Project

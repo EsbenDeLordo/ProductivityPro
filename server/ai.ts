@@ -23,10 +23,10 @@ export type AIProvider = 'deepseek' | 'gemini' | 'anthropic' | 'auto';
 function chooseProvider(requestedProvider: AIProvider): AIProvider {
   if (requestedProvider === 'auto') {
     // Choose the first available provider in order of preference
-    if (DEEPSEEK_API_KEY) return 'deepseek';
+    if (GEMINI_API_KEY) return 'gemini';  // Prioritize Gemini since it has a free tier
     if (ANTHROPIC_API_KEY) return 'anthropic';
-    if (GEMINI_API_KEY) return 'gemini';
-    return 'deepseek'; // Default to DeepSeek for mock responses
+    if (DEEPSEEK_API_KEY) return 'deepseek';
+    return 'gemini'; // Default to Gemini for mock responses
   }
   
   // If specifically requested provider is not available, fall back to auto

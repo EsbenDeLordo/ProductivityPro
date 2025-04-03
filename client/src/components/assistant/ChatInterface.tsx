@@ -376,9 +376,9 @@ export default function ChatInterface() {
                         <SelectValue placeholder="Select AI provider" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="auto">Auto (Use best available)</SelectItem>
-                        <SelectItem value="deepseek">DeepSeek</SelectItem>
-                        <SelectItem value="gemini">Gemini</SelectItem>
+                        <SelectItem value="auto">Auto (Prefers Gemini)</SelectItem>
+                        <SelectItem value="gemini">Gemini (Free Tier Available)</SelectItem>
+                        <SelectItem value="deepseek">DeepSeek (Requires Paid API)</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-gray-500">

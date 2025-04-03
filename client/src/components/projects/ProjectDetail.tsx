@@ -79,8 +79,18 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
     }
   });
 
-  const updateProject = (updatedData: Partial<Project>) => {
-    return updateProjectMutation.mutateAsync(updatedData);
+  const updateProject = async (updatedData: Partial<Project>) => {
+    try {
+      const result = await updateProjectMutation.mutateAsync({
+        ...project,
+        ...updatedData,
+        timeLogged: project.timeLogged || 0
+      });
+      return result;
+    } catch (error) {
+      console.error('Failed to update project:', error);
+      throw error;
+    }
   };
 
   // Send message mutation

@@ -1,13 +1,8 @@
+
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { WorkSession } from "@shared/schema";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-
-interface TimeLogged {
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
 
 interface TimeDisplay {
   hours: number;
@@ -31,16 +26,6 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
   const userId = 1; // For demo purposes
   const [elapsedTime, setElapsedTime] = useState<TimeDisplay>({ hours: 0, minutes: 0, seconds: 0 });
   const [isSessionActive, setIsSessionActive] = useState(false);
-
-  // Reset timer when session ends
-  useEffect(() => {
-    if (!currentSession || currentSession.endTime) {
-      setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
-      setIsSessionActive(false);
-    } else {
-      setIsSessionActive(true);
-    }
-  }, [currentSession]);
   const timerRef = useRef<NodeJS.Timeout>();
 
   // Get current session
@@ -54,39 +39,18 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
     }),
   });
 
-  const startSessionMutation = useMutation({
-    mutationFn: (sessionData: { userId: number, projectId: number | null, startTime: Date, type: string }) => 
-      apiRequest('POST', '/api/work-sessions', sessionData).then(res => res.json()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/work-session/current', userId] });
+  // Reset timer when session ends or changes
+  useEffect(() => {
+    if (!currentSession || currentSession.endTime) {
+      setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
+      setIsSessionActive(false);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    } else {
+      setIsSessionActive(true);
     }
-  });
-
-  const endSessionMutation = useMutation({
-    mutationFn: (sessionId: number) => 
-      apiRequest('POST', `/api/work-session/${sessionId}/end`, {}).then(res => res.json()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/work-session/current', userId] });
-    }
-  });
-
-  const startSession = async (projectId: number | null, type: string) => {
-    // Convert to ISO string for API
-    const now = new Date();
-    return startSessionMutation.mutateAsync({
-      userId,
-      projectId,
-      startTime: now.toISOString(),
-      type
-    });
-  };
-
-  const endSession = async () => {
-    if (!currentSession) {
-      return null;
-    }
-    return endSessionMutation.mutateAsync(currentSession.id);
-  };
+  }, [currentSession]);
 
   // Update elapsed time every second when session is active
   useEffect(() => {
@@ -113,10 +77,41 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
           clearInterval(timerRef.current);
         }
       };
-    } else {
-      setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
     }
   }, [currentSession]);
+
+  const startSessionMutation = useMutation({
+    mutationFn: (sessionData: { userId: number, projectId: number | null, startTime: Date, type: string }) => 
+      apiRequest('POST', '/api/work-sessions', sessionData).then(res => res.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/work-session/current', userId] });
+    }
+  });
+
+  const endSessionMutation = useMutation({
+    mutationFn: (sessionId: number) => 
+      apiRequest('POST', `/api/work-session/${sessionId}/end`, {}).then(res => res.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/work-session/current', userId] });
+    }
+  });
+
+  const startSession = async (projectId: number | null, type: string) => {
+    const now = new Date();
+    return startSessionMutation.mutateAsync({
+      userId,
+      projectId,
+      startTime: now,
+      type
+    });
+  };
+
+  const endSession = async () => {
+    if (!currentSession) {
+      return null;
+    }
+    return endSessionMutation.mutateAsync(currentSession.id);
+  };
 
   return (
     <WorkSessionContext.Provider value={{ 

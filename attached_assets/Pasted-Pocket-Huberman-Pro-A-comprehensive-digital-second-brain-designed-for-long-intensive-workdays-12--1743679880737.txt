@@ -1,0 +1,32 @@
+Pocket Huberman Pro
+
+A comprehensive digital second brain designed for long, intensive workdays (12–14 hours), blending AI-assisted project management with real-time productivity monitoring and personalized habit recommendations. Here’s what it could include:
+1. Intelligent Project Automation
+
+    Smart Project Templates: When you declare a new project (e.g., "new video about McMillions"), the app automatically creates a dedicated project folder. This folder comes preloaded with sections for research, script drafts, media clips, brainstorming notes, and even a storyboard template tailored to your video production needs.
+
+    Dynamic Resource Aggregation: It scours your past projects and external sources (via APIs or integrations) to suggest relevant research articles, clips, and even citation templates.
+
+2. Integrated AI Assistant
+
+    Side-Chat Editor: A built-in chat assistant that can refine and edit your drafts or even generate new ones based on your input. Think of it as an AI collaborator who understands your style—whether you're drafting a script or preparing an outline.
+
+    Content Adaptation: On command, the assistant can adjust your work templates to match the tone or format you prefer, ensuring consistency across projects.
+
+3. Real-Time Progress Monitoring & Analytics
+
+    Work Session Tracker: Automatically monitors your work hours, breaks, and periods of intense focus. The app logs productivity metrics, such as “flow state” periods, and visualizes them in an interactive dashboard.
+
+    Adaptive Check-Ins: Provides gentle prompts when you’re veering off track, and celebrates milestones with customized notifications—keeping you motivated throughout those long workdays.
+
+4. Daily Productivity Hacks & Personalized Recommendations
+
+    Pocket Huberman Mode: Based on neuroscience and behavioral research, it offers daily recommendations—like optimal break schedules, NSDR techniques, hydration reminders, or light exercise routines to boost focus.
+
+    Behavioral Insights: Analyzes your productivity patterns over time and adapts its advice to your natural rhythms, ensuring that you work smarter, not just harder.
+
+5. Seamless Integration & Workflow Optimization
+
+    Media & File Integration: Connects with your existing tools (cloud storage, video editors, note-taking apps) so that everything related to your projects is in one place.
+
+    Smart Scheduling: Syncs with your calendar to block focus sessions, schedule breaks, and even plan time for creative brainstorming based on when you’re most productive.

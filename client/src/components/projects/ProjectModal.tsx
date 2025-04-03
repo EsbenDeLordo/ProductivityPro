@@ -97,13 +97,15 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
   
   const onSubmit = async (data: FormData) => {
     try {
-      await createProject(data);
+      const newProject = await createProject(data);
       toast({
         title: "Project created",
         description: "Your new project has been created successfully."
       });
       form.reset();
       onClose();
+      // Force a refresh of the projects list
+      await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
     } catch (error) {
       toast({
         title: "Error",

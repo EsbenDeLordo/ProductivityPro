@@ -9,6 +9,7 @@ import Analytics from "@/pages/Analytics";
 import Assistant from "@/pages/Assistant";
 import Recommendations from "@/pages/Recommendations";
 import ContentTools from "@/pages/ContentTools";
+import Automation from "@/pages/Automation";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import { useState, useEffect } from "react";
@@ -43,6 +44,7 @@ function App() {
               <Route path="/assistant" component={Assistant} />
               <Route path="/recommendations" component={Recommendations} />
               <Route path="/content-tools" component={ContentTools} />
+              <Route path="/automation" component={Automation} />
               <Route component={NotFound} />
             </Switch>
           </main>

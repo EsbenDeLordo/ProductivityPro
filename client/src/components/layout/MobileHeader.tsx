@@ -28,6 +28,8 @@ export default function MobileHeader({ user }: MobileHeaderProps) {
         return "Recommendations";
       case "/content-tools":
         return "Content Tools";
+      case "/automation":
+        return "Automation";
       default:
         return "Pocket WinDryft Pro";
     }

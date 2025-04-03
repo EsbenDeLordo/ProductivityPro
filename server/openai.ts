@@ -2,13 +2,14 @@ import axios from "axios";
 
 // DeepSeek API configuration
 const DEEPSEEK_API_MOCK = "sk-mock-key-for-development";
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || DEEPSEEK_API_MOCK;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+console.log("DeepSeek API Key status:", DEEPSEEK_API_KEY ? "Available" : "Not available");
 
 // Helper function to call DeepSeek API
 async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
   try {
-    // If using mock key, return an appropriate mock response based on the context
-    if (DEEPSEEK_API_KEY === DEEPSEEK_API_MOCK) {
+    // If no API key is available, return an appropriate mock response based on the context
+    if (!DEEPSEEK_API_KEY) {
       const context = messages[0]?.content || "";
       const userQuery = messages[1]?.content || "";
       

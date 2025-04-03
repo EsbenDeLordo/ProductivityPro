@@ -115,15 +115,14 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   // Handle session toggling
   const handleSessionToggle = async () => {
     try {
-      if (isSessionActive) {
-        // If there's an active session, end it
+      if (isSessionActive && currentSession?.projectId === project.id) {
         await endSession();
         toast({
           title: "Session ended",
           description: "Your work session has been saved."
         });
       } else {
-        // Start a new session for this project
+        const now = new Date();
         await startSession(project.id, "focus");
         toast({
           title: "Session started",
@@ -498,7 +497,27 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
-                onClick={() => setIsProjectModalOpen(true)}
+                onClick={async () => {
+                  try {
+                    await updateProject(project.id, {
+                      name: project.name,
+                      description: project.description,
+                      type: project.type,
+                      deadline: project.deadline || "",
+                      aiAssistanceEnabled: project.aiAssistanceEnabled
+                    });
+                    toast({
+                      title: "Project updated",
+                      description: "Changes have been saved successfully."
+                    });
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to update project",
+                      variant: "destructive"
+                    });
+                  }
+                }}
               >
                 <span className="material-icons mr-2">edit</span>
                 Edit Project

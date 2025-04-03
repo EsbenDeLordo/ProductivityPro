@@ -47,7 +47,7 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
     return startSessionMutation.mutateAsync({
       userId,
       projectId,
-      startTime: new Date(),
+      startTime: new Date().toISOString(),
       type
     });
   };

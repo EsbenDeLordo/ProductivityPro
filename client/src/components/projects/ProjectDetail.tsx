@@ -24,19 +24,19 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   const { currentSession, startSession, endSession, isSessionActive } = useWorkSession();
   const [activeTab, setActiveTab] = useState("overview");
   const [progress, setProgress] = useState(project.progress);
-  
+
   // Get template for this project type
   const { data: template } = useQuery<ProjectTemplate>({
     queryKey: ['/api/project-template/type', project.type],
     queryFn: () => fetch(`/api/project-template/type/${project.type}`).then(res => res.json())
   });
-  
+
   // Get messages for this project
   const { data: messages = [] } = useQuery({
     queryKey: ['/api/assistant-messages', project.userId, project.id],
     queryFn: () => fetch(`/api/assistant-messages/${project.userId}?projectId=${project.id}`).then(res => res.json())
   });
-  
+
   // Update project mutation
   const updateProjectMutation = useMutation({
     mutationFn: (data: Partial<Project>) => 
@@ -51,7 +51,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       });
     }
   });
-  
+
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => 
@@ -65,26 +65,26 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       queryClient.invalidateQueries({ queryKey: ['/api/assistant-messages', project.userId, project.id] });
     }
   });
-  
+
   // Format time logged (minutes to hours and minutes)
   const formatTimeLogged = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;
   };
-  
+
   // Calculate days until deadline
   const getDaysUntilDeadline = () => {
     if (!project.deadline) return "No deadline";
-    
+
     const deadline = new Date(project.deadline);
     const now = new Date();
     const diffTime = deadline.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return diffDays > 0 ? `Due in ${diffDays} days` : "Overdue";
   };
-  
+
   // Handle session toggling
   const handleSessionToggle = async () => {
     if (isSessionActive) {
@@ -103,32 +103,32 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       });
     }
   };
-  
+
   // Handle progress update
   const handleProgressUpdate = () => {
     updateProjectMutation.mutate({ progress });
   };
-  
+
   // Handle message sending
   const [message, setMessage] = useState("");
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-    
+
     sendMessageMutation.mutate(message);
     setMessage("");
   };
-  
+
   // Get session elapsed time
   const getSessionElapsed = () => {
     if (!currentSession) return 0;
-    
+
     const startTime = new Date(currentSession.startTime).getTime();
     const now = new Date().getTime();
     const elapsedMs = now - startTime;
     return Math.floor(elapsedMs / 1000); // Convert to seconds
   };
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between">
@@ -149,7 +149,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
           Back to Projects
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="md:col-span-3">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -158,7 +158,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="assistant">AI Assistant</TabsTrigger>
             </TabsList>
-            
+
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
               <Card>
@@ -187,7 +187,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                       Update
                     </Button>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
@@ -216,7 +216,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                   </div>
                 </CardContent>
               </Card>
-              
+
               {template && template.sections && Array.isArray(template.sections) && (
                 <Card>
                   <CardHeader>
@@ -237,7 +237,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 </Card>
               )}
             </TabsContent>
-            
+
             {/* Content Tab */}
             <TabsContent value="content" className="space-y-6">
               <Card>
@@ -252,7 +252,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                   <Button>Save Notes</Button>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Files & Resources</CardTitle>
@@ -263,7 +263,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                     <p className="text-sm text-gray-500 dark:text-gray-400">Drag and drop files here or click to browse</p>
                     <Button variant="outline" className="mt-4">Upload Files</Button>
                   </div>
-                  
+
                   {project.files > 0 ? (
                     <div className="mt-6 space-y-2">
                       <h3 className="font-medium text-gray-900 dark:text-white">Uploaded Files ({project.files})</h3>
@@ -279,7 +279,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             {/* AI Assistant Tab */}
             <TabsContent value="assistant" className="space-y-6">
               <Card>
@@ -297,7 +297,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                                 <span className="material-icons text-sm text-gray-500 dark:text-gray-400">smart_toy</span>
                               </div>
                             )}
-                            
+
                             <div className={`mx-3 max-w-xs md:max-w-md rounded-lg p-3 ${
                               msg.sender === 'user' 
                                 ? 'bg-primary text-white' 
@@ -311,7 +311,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                                 {msg.content}
                               </p>
                             </div>
-                            
+
                             {msg.sender === 'user' && (
                               <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
                                 <span className="material-icons text-sm text-gray-500 dark:text-gray-400">person</span>
@@ -325,7 +325,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                           <p className="text-gray-500 dark:text-gray-400">Ask the AI assistant for help with your project</p>
                         </div>
                       )}
-                      
+
                       {sendMessageMutation.isPending && (
                         <div className="flex items-start">
                           <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
@@ -337,7 +337,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                         </div>
                       )}
                     </div>
-                    
+
                     <form className="flex" onSubmit={handleSendMessage}>
                       <Input 
                         type="text" 
@@ -358,7 +358,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                   </div>
                 </CardContent>
               </Card>
-              
+
               {project.aiAssistanceEnabled && (
                 <Card>
                   <CardHeader>
@@ -375,7 +375,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                           Based on your project type, consider organizing your content into sections for easier management.
                         </p>
                       </div>
-                      
+
                       <div className="p-4 border rounded-lg bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
                         <h3 className="font-medium text-gray-900 dark:text-white flex items-center">
                           <span className="material-icons text-accent mr-2">psychology</span>
@@ -392,7 +392,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
             </TabsContent>
           </Tabs>
         </div>
-        
+
         {/* Sidebar */}
         <div className="space-y-6">
           <Card>
@@ -414,7 +414,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                   </div>
                 )}
               </div>
-              
+
               <div className="text-center mb-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {isSessionActive && currentSession?.projectId === project.id
@@ -427,7 +427,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                     : "Start a new session"}
                 </p>
               </div>
-              
+
               <Button 
                 onClick={handleSessionToggle}
                 variant={isSessionActive && currentSession?.projectId === project.id ? "destructive" : "default"}
@@ -440,7 +440,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               </Button>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>

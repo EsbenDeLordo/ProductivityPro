@@ -16,10 +16,12 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
-  
-  const { data: projects = [], isLoading, error } = useQuery<Project[]>({
+
+  const { data: projects = [], isLoading, error, refetch } = useQuery<Project[]>({ // Added refetch and adjusted data default
     queryKey: ['/api/projects', userId],
     queryFn: ({ queryKey }) => fetch(`${queryKey[0]}/${queryKey[1]}`).then(res => res.json()),
+    refetchOnWindowFocus: true, // Added to improve state management
+    staleTime: 0 // Added to ensure immediate updates
   });
 
   const createProjectMutation = useMutation({

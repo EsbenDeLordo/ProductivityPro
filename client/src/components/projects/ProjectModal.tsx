@@ -107,6 +107,9 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
         timeLogged: 0
       });
       
+      await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/projects'] });
+      
       toast({
         title: "Project created",
         description: "Your new project has been created successfully."

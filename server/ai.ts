@@ -226,20 +226,20 @@ async function callGeminiAPI(messages: any[], jsonFormat: boolean = false) {
       // Safety settings using the proper enum values from the SDK
       safetySettings: [
         {
-          category: "harassment",
-          threshold: "block_medium_and_above"
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
-          category: "hate_speech",
-          threshold: "block_medium_and_above"
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
-          category: "sexually_explicit",
-          threshold: "block_medium_and_above"
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
-          category: "dangerous_content",
-          threshold: "block_medium_and_above"
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
         }
       ]
     });

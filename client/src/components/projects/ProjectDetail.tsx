@@ -127,7 +127,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
             description: "Your work session has been saved."
           });
         }
-      } else if (!isSessionActive) {
+      } else if (!isSessionActive && project.id) {
         await startSession(project.id, "focus");
         toast({
           title: "Session started",
@@ -504,7 +504,9 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 className="w-full justify-start"
                 onClick={async () => {
                   try {
+                    if (!project.id) return;
                     await updateProject({
+                      id: project.id,
                       name: project.name,
                       description: project.description,
                       type: project.type,

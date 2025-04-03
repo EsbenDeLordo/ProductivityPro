@@ -51,9 +51,10 @@ interface ProjectModalProps {
 }
 
 export default function ProjectModal({ isOpen, onClose, project }: ProjectModalProps) {
-  const { createProject } = useProjects();
+  const { createProject, updateProject } = useProjects();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isEditMode = !!project;
   const userId = 1; // For demo purposes
   
   // Get project templates
@@ -103,36 +104,28 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
   
   const onSubmit = async (data: FormData) => {
     try {
-      if (project) {
-        // Update existing project
-        const updatedProject = await apiRequest('PUT', `/api/project/${project.id}`, data);
-        queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
-          return Array.isArray(oldData) 
-            ? oldData.map(p => p.id === project.id ? updatedProject : p)
-            : [updatedProject];
+      if (isEditMode && project) {
+        await updateProject({
+          ...project,
+          ...data
         });
         toast({
           title: "Project updated",
           description: "Project has been updated successfully."
         });
       } else {
-        // Create new project
-        const newProject = await createProject({
+        await createProject({
           ...data,
           status: 'active',
           progress: 0,
           files: 0,
           timeLogged: 0
         });
-        queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
-          return Array.isArray(oldData) ? [...oldData, newProject] : [newProject];
-        });
         toast({
           title: "Project created",
           description: "Your new project has been created successfully."
         });
       }
-      
       await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
       form.reset();
       onClose();
@@ -140,7 +133,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
       console.error('Failed to save project:', error);
       toast({
         title: "Error",
-        description: `Failed to ${project ? 'update' : 'create'} project. Please try again.`,
+        description: `Failed to ${isEditMode ? 'update' : 'create'} project. Please try again.`,
         variant: "destructive"
       });
     }

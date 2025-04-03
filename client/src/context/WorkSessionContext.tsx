@@ -16,6 +16,8 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(und
 
 export function WorkSessionProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout>();
 
   const { data: currentSession, isLoading, error } = useQuery<WorkSession | null>({
     queryKey: ['/api/work-session/current', userId],
@@ -26,6 +28,28 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
       return res.json();
     }),
   });
+
+  useEffect(() => {
+    if (currentSession) {
+      const startTime = new Date(currentSession.startTime).getTime();
+      const updateElapsed = () => {
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTime) / 1000);
+        setElapsedTime(elapsed);
+      };
+      
+      updateElapsed();
+      intervalRef.current = setInterval(updateElapsed, 1000);
+      
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    } else {
+      setElapsedTime(0);
+    }
+  }, [currentSession]);
 
   const startSessionMutation = useMutation({
     mutationFn: (sessionData: { userId: number, projectId: number | null, startTime: Date, type: string }) => 

@@ -110,6 +110,7 @@ export const assistantMessages = pgTable("assistant_messages", {
   projectId: integer("project_id"),
   content: text("content").notNull(),
   sender: text("sender").notNull(), // 'user' or 'assistant'
+  provider: text("provider"), // 'deepseek', 'gemini', or null for user messages
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
@@ -118,6 +119,7 @@ export const insertAssistantMessageSchema = createInsertSchema(assistantMessages
   projectId: true,
   content: true,
   sender: true,
+  provider: true,
 });
 
 // Daily analytics model

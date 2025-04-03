@@ -62,6 +62,7 @@ export default function ChatInterface() {
   const { projects } = useProjects();
   const [message, setMessage] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>("general");
+  const [selectedProvider, setSelectedProvider] = useState<string>("auto");
   const [contentToAnalyze, setContentToAnalyze] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showConversationHistory, setShowConversationHistory] = useState(false);
@@ -109,7 +110,8 @@ export default function ChatInterface() {
         userId,
         projectId: selectedProjectId && selectedProjectId !== "general" ? parseInt(selectedProjectId) : null,
         content,
-        sender: "user"
+        sender: "user",
+        provider: selectedProvider
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -289,7 +291,13 @@ export default function ChatInterface() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleAddApiKey}>
                     <KeyRound className="mr-2 h-4 w-4" />
-                    Add API Key
+                    AI Settings
+                    <span className="ml-2 text-xs text-gray-500">
+                      ({selectedProvider === "auto" ? "Auto" : 
+                        selectedProvider === "deepseek" ? "DeepSeek" : 
+                        selectedProvider === "gemini" ? "Gemini" : 
+                        "Claude"})
+                    </span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
@@ -349,22 +357,63 @@ export default function ChatInterface() {
           <Dialog open={isApiKeyDialogOpen} onOpenChange={setIsApiKeyDialogOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Set DeepSeek AI API Key</DialogTitle>
+                <DialogTitle>AI Settings</DialogTitle>
                 <DialogDescription>
-                  Enter your DeepSeek API key to enhance the AI assistant's capabilities.
-                  You can get an API key by signing up at deepseek.ai.
+                  Configure AI providers and API settings.
                 </DialogDescription>
               </DialogHeader>
               <div className="py-4">
                 <div className="space-y-4">
-                  <p className="text-sm text-amber-600 dark:text-amber-400">
-                    Note: In a production app, this would securely save your API key.
-                    This demo only simulates the dialog but doesn't actually save the key.
-                  </p>
-                  <Input 
-                    type="password" 
-                    placeholder="sk-..." 
-                  />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">AI Provider</label>
+                    <Select 
+                      value={selectedProvider}
+                      onValueChange={setSelectedProvider}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select AI provider" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="auto">Auto (Use best available)</SelectItem>
+                        <SelectItem value="deepseek">DeepSeek</SelectItem>
+                        <SelectItem value="gemini">Gemini</SelectItem>
+                        <SelectItem value="anthropic">Claude (Anthropic)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500">
+                      The "Auto" option will use the best available provider. 
+                      You need API keys configured on the server for each provider.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2 mt-4 pt-4 border-t">
+                    <label className="text-sm font-medium">API Keys</label>
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                      Note: In a production app, this would securely save your API key.
+                      This demo only simulates the dialog but requires keys to be added to the server environment.
+                    </p>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium">DeepSeek API Key</label>
+                      <Input 
+                        type="password" 
+                        placeholder="sk-..." 
+                      />
+                    </div>
+                    <div className="space-y-2 mt-2">
+                      <label className="text-xs font-medium">Gemini API Key</label>
+                      <Input 
+                        type="password" 
+                        placeholder="..." 
+                      />
+                    </div>
+                    <div className="space-y-2 mt-2">
+                      <label className="text-xs font-medium">Anthropic API Key</label>
+                      <Input 
+                        type="password" 
+                        placeholder="sk-ant-..." 
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -374,13 +423,18 @@ export default function ChatInterface() {
                 <Button 
                   onClick={() => {
                     toast({
-                      title: "API Key Needed",
-                      description: "Please contact the server administrator to add a DeepSeek API key to the environment variables.",
+                      title: "AI Provider Settings",
+                      description: `Using ${
+                        selectedProvider === 'auto' ? 'Auto' : 
+                        selectedProvider === 'deepseek' ? 'DeepSeek' : 
+                        selectedProvider === 'gemini' ? 'Gemini' :
+                        'Claude'
+                      } as your AI provider. API keys must be configured on the server.`,
                     });
                     setIsApiKeyDialogOpen(false);
                   }}
                 >
-                  Save API Key
+                  Save Settings
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -451,6 +505,27 @@ export default function ChatInterface() {
                           ? 'bg-primary text-white' 
                           : 'bg-gray-100 dark:bg-gray-700'
                       }`}>
+                        {msg.sender === 'assistant' && msg.provider && (
+                          <div className="flex items-center mb-1">
+                            <span className={`text-xs px-1.5 py-0.5 rounded ${
+                              msg.provider === 'deepseek' 
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                                : msg.provider === 'gemini'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                                : msg.provider === 'anthropic'
+                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
+                                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                            }`}>
+                              {msg.provider === 'deepseek' 
+                                ? 'DeepSeek' 
+                                : msg.provider === 'gemini' 
+                                ? 'Gemini'
+                                : msg.provider === 'anthropic'
+                                ? 'Claude' 
+                                : 'AI'}
+                            </span>
+                          </div>
+                        )}
                         <p className={`text-sm ${
                           msg.sender === 'user' 
                             ? 'text-white' 
@@ -496,11 +571,32 @@ export default function ChatInterface() {
                       <span className="material-icons text-sm text-gray-500 dark:text-gray-400">smart_toy</span>
                     </div>
                     <div className="ml-3 max-w-xs md:max-w-md bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse delay-150"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse delay-300"></div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Thinking...</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center mb-1">
+                          <span className={`text-xs px-1.5 py-0.5 rounded ${
+                            selectedProvider === 'deepseek' 
+                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                              : selectedProvider === 'gemini'
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                              : selectedProvider === 'anthropic'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
+                              : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
+                          }`}>
+                            {selectedProvider === 'deepseek' 
+                              ? 'DeepSeek' 
+                              : selectedProvider === 'gemini' 
+                              ? 'Gemini' 
+                              : selectedProvider === 'anthropic'
+                              ? 'Claude'
+                              : 'Auto'}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
+                          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse delay-150"></div>
+                          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse delay-300"></div>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Thinking...</span>
+                        </div>
                       </div>
                     </div>
                   </div>

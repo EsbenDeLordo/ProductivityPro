@@ -13,8 +13,9 @@ import {
   generateProjectSuggestions,
   generateProductivityRecommendations,
   summarizeContent,
-  extractKeyPoints
-} from "./openai";
+  extractKeyPoints,
+  type AIProvider
+} from "./ai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes - prefix all routes with /api
@@ -318,8 +319,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       // Generate new recommendations using AI
-      const workData = req.body;
-      const recommendationsData = await generateProductivityRecommendations(userId, workData);
+      const { workData, provider } = req.body;
+      const aiProvider = (provider as AIProvider) || 'auto';
+      
+      const recommendationsData = await generateProductivityRecommendations(
+        userId, 
+        workData || {}, 
+        aiProvider
+      );
       
       // Save the recommendations to the database
       const savedRecommendations = [];
@@ -374,12 +381,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
+        // Extract provider from request or use auto
+        const provider = (req.body.provider as AIProvider) || 'auto';
+        
         // Generate AI response
         const aiResponse = await generateAssistantResponse(
           messageData.userId,
           messageData.projectId || null,
           messageData.content,
-          projectContext
+          projectContext,
+          provider
         );
         
         // Save the AI response
@@ -387,7 +398,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId: messageData.userId,
           projectId: messageData.projectId,
           content: aiResponse ?? "",
-          sender: "assistant"
+          sender: "assistant",
+          provider: provider // Save which provider was used
         });
         
         res.status(201).json({
@@ -421,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Project suggestions route
   app.post("/api/project-suggestions", async (req, res) => {
-    const { projectType, projectName, projectDescription } = req.body;
+    const { projectType, projectName, projectDescription, provider } = req.body;
     
     if (!projectType || !projectName) {
       return res.status(400).json({ message: "Project type and name are required" });
@@ -431,7 +443,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const suggestions = await generateProjectSuggestions(
         projectType,
         projectName,
-        projectDescription || ""
+        projectDescription || "",
+        (provider as AIProvider) || 'auto'
       );
       
       res.json(suggestions);
@@ -442,7 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Content summarization route
   app.post("/api/summarize", async (req, res) => {
-    const { content, maxLength, format, maxPoints } = req.body;
+    const { content, maxLength, format, maxPoints, provider } = req.body;
     
     if (!content) {
       return res.status(400).json({ message: "Content is required" });
@@ -450,12 +463,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       let summary;
+      const aiProvider = (provider as AIProvider) || 'auto';
       
       if (format === 'key_points') {
         // Use dedicated key points extraction function
-        summary = await extractKeyPoints(content, maxPoints || 5);
+        summary = await extractKeyPoints(content, maxPoints || 5, aiProvider);
       } else {
-        summary = await summarizeContent(content, maxLength || 500);
+        summary = await summarizeContent(content, maxLength || 500, aiProvider);
       }
       
       res.json({ summary });

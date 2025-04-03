@@ -21,7 +21,7 @@ export default function ChatInterface() {
   const userId = 1; // For demo purposes
   const { projects } = useProjects();
   const [message, setMessage] = useState("");
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>("general");
   const [contentToAnalyze, setContentToAnalyze] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -29,7 +29,7 @@ export default function ChatInterface() {
   const { data: messages = [] } = useQuery<AssistantMessage[]>({
     queryKey: ['/api/assistant-messages', userId, selectedProjectId],
     queryFn: () => {
-      const url = selectedProjectId
+      const url = selectedProjectId && selectedProjectId !== "general"
         ? `/api/assistant-messages/${userId}?projectId=${selectedProjectId}`
         : `/api/assistant-messages/${userId}`;
       return fetch(url).then(res => res.json());
@@ -41,7 +41,7 @@ export default function ChatInterface() {
     mutationFn: (content: string) => 
       apiRequest('POST', '/api/assistant-messages', {
         userId,
-        projectId: selectedProjectId ? parseInt(selectedProjectId) : null,
+        projectId: selectedProjectId && selectedProjectId !== "general" ? parseInt(selectedProjectId) : null,
         content,
         sender: "user"
       }),
@@ -98,7 +98,7 @@ export default function ChatInterface() {
                 <SelectValue placeholder="Select a project" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">General Conversation</SelectItem>
+                <SelectItem value="general">General Conversation</SelectItem>
                 {projects.map((project) => (
                   <SelectItem key={project.id} value={project.id.toString()}>
                     {project.name}

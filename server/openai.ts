@@ -1,16 +1,19 @@
-import OpenAI from "openai";
 import axios from "axios";
 
-// Configuration for AI providers
-const AI_PROVIDER = process.env.DEEPSEEK_API_KEY ? "deepseek" : "openai";
-const MODEL_NAME = AI_PROVIDER === "deepseek" ? "deepseek-chat" : "gpt-4o";
-
-// Initialize OpenAI client - only used if DEEPSEEK_API_KEY is not set
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? "mock-key-for-development" });
+// DeepSeek API configuration
+const DEEPSEEK_API_MOCK = "sk-mock-key-for-development";
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || DEEPSEEK_API_MOCK;
 
 // Helper function to call DeepSeek API
 async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
   try {
+    // If using mock key, return a mock response
+    if (DEEPSEEK_API_KEY === DEEPSEEK_API_MOCK) {
+      return jsonFormat 
+        ? '{"status": "mocked", "message": "This is a mock response because no DEEPSEEK_API_KEY is set"}'
+        : "This is a mock response because no DEEPSEEK_API_KEY is set. Please provide a DEEPSEEK_API_KEY to get actual AI responses.";
+    }
+    
     const response = await axios.post(
       "https://api.deepseek.com/v1/chat/completions",
       {
@@ -20,7 +23,7 @@ async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
       },
       {
         headers: {
-          "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+          "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
           "Content-Type": "application/json",
         },
       }
@@ -29,26 +32,21 @@ async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
     return response.data.choices[0].message.content;
   } catch (error) {
     console.error("Error calling DeepSeek API:", error);
-    throw error;
+    return jsonFormat 
+      ? '{"error": true, "message": "Failed to get response from DeepSeek API"}'
+      : "Failed to get response from DeepSeek API. Please check your API key and try again.";
   }
 }
 
-// Generic function to handle AI completion with either provider
+// Function to handle AI completion
 async function getAICompletion(messages: any[], jsonFormat: boolean = false) {
   try {
-    if (AI_PROVIDER === "deepseek") {
-      return await callDeepSeekAPI(messages, jsonFormat);
-    } else {
-      const response = await openai.chat.completions.create({
-        model: MODEL_NAME,
-        messages: messages,
-        response_format: jsonFormat ? { type: "json_object" } : undefined,
-      });
-      return response.choices[0].message.content ?? "";
-    }
+    return await callDeepSeekAPI(messages, jsonFormat);
   } catch (error) {
-    console.error(`Error getting AI completion from ${AI_PROVIDER}:`, error);
-    throw error;
+    console.error(`Error getting AI completion:`, error);
+    return jsonFormat 
+      ? '{"error": true, "message": "Failed to process AI request"}'
+      : "Failed to process AI request. Please try again later.";
   }
 }
 

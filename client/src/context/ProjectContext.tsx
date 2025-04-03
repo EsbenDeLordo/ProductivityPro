@@ -47,10 +47,15 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   });
 
   const createProject = async (project: Omit<Project, "id" | "createdAt" | "status" | "progress" | "files" | "timeLogged">) => {
-    const result = await createProjectMutation.mutateAsync(project);
-    // Force refresh projects list
-    await queryClient.invalidateQueries({ queryKey: ['/api/projects', userId] });
-    return result;
+    try {
+      const result = await createProjectMutation.mutateAsync(project);
+      await queryClient.invalidateQueries({ queryKey: ['/api/projects', userId] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      return result;
+    } catch (error) {
+      console.error('Error creating project:', error);
+      throw error;
+    }
   };
 
   const updateProject = async (id: number, project: Partial<Project>) => {

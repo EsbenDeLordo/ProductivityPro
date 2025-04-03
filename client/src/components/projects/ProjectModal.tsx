@@ -99,17 +99,25 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
   
   const onSubmit = async (data: FormData) => {
     try {
-      const newProject = await createProject(data);
+      const newProject = await createProject({
+        ...data,
+        status: 'active',
+        progress: 0,
+        files: 0,
+        timeLogged: 0
+      });
+      
       toast({
         title: "Project created",
         description: "Your new project has been created successfully."
       });
+      
       form.reset();
-      // Force a refresh of the projects list
-      await queryClient.invalidateQueries({ queryKey: [`/api/projects/${data.userId}`] });
       await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/projects'] });
       onClose();
     } catch (error) {
+      console.error('Failed to create project:', error);
       toast({
         title: "Error",
         description: "Failed to create project. Please try again.",

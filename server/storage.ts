@@ -738,12 +738,16 @@ export class DatabaseStorage implements IStorage {
 
     const endTime = new Date();
     const startTime = new Date(session.startTime);
-    const durationInMinutes = Math.floor((endTime.getTime() - startTime.getTime()) / (1000 * 60));
+    const durationInSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+    const durationInMinutes = durationInSeconds / 60;
 
     // Update the session
     const [updatedSession] = await db
       .update(workSessions)
-      .set({ endTime })
+      .set({ 
+        endTime,
+        duration: durationInSeconds 
+      })
       .where(eq(workSessions.id, id))
       .returning();
 
@@ -752,7 +756,9 @@ export class DatabaseStorage implements IStorage {
       const [project] = await db.select().from(projects).where(eq(projects.id, session.projectId)).limit(1);
       if (project) {
         const newTimeLogged = (project.timeLogged || 0) + durationInMinutes;
-        await this.updateProject(session.projectId, { timeLogged: newTimeLogged });
+        await this.updateProject(session.projectId, { 
+          timeLogged: Math.round(newTimeLogged * 100) / 100 
+        });
       }
     }
 

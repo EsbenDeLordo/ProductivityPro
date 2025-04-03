@@ -131,21 +131,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const project = await storage.getProject(projectId);
+      const existingProject = await storage.getProject(projectId);
       
-      if (!project) {
+      if (!existingProject) {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      const existingProject = await storage.getProject(projectId);
+      // Remove undefined values to prevent overwriting with null
+      const updateData = Object.fromEntries(
+        Object.entries(req.body).filter(([_, v]) => v !== undefined)
+      );
+
       const updatedProject = await storage.updateProject(projectId, {
         ...existingProject,
-        ...req.body,
-        timeLogged: req.body.timeLogged ?? existingProject.timeLogged ?? 0
+        ...updateData,
+        timeLogged: updateData.timeLogged ?? existingProject.timeLogged ?? 0
       });
+      
       res.json(updatedProject);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update project" });
+      console.error('Project update error:', error);
+      res.status(500).json({ 
+        message: "Failed to update project",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

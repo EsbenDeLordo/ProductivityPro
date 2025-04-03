@@ -9,8 +9,14 @@ interface TimeLogged {
   seconds: number;
 }
 
+interface TimeDisplay {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
 interface WorkSessionContextType {
-  elapsedTime: number;
+  elapsedTime: TimeDisplay;
   currentSession: WorkSession | null;
   isLoading: boolean;
   error: Error | null;
@@ -23,7 +29,7 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(und
 
 export function WorkSessionProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState<TimeDisplay>({ hours: 0, minutes: 0, seconds: 0 });
   const timerRef = useRef<NodeJS.Timeout>();
 
   // Get current session
@@ -76,19 +82,28 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
     if (currentSession && !currentSession.endTime) {
       const startTime = new Date(currentSession.startTime).getTime();
       
+      const updateElapsedTime = () => {
+        const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        setElapsedTime({ hours, minutes, seconds });
+      };
+      
       // Set initial elapsed time
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      updateElapsedTime();
       
       // Start timer
-      timerRef.current = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 1000);
+      timerRef.current = setInterval(updateElapsedTime, 1000);
       
       return () => {
         if (timerRef.current) {
           clearInterval(timerRef.current);
         }
       };
+    } else {
+      setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
     }
   }, [currentSession]);
 

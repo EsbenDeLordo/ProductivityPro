@@ -485,7 +485,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 </p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {isSessionActive && currentSession?.projectId === project.id
-                    ? "Deep Work"
+                    ? `${String(elapsedTime.hours).padStart(2, '0')}:${String(elapsedTime.minutes).padStart(2, '0')}:${String(elapsedTime.seconds).padStart(2, '0')}`
                     : "Start a new session"}
                 </p>
               </div>

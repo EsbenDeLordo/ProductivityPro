@@ -111,18 +111,18 @@ export default function ContentTools() {
         '/api/summarize',
         { 
           content, 
-          maxLength: 1000,
           format: 'key_points',
           maxPoints
         }
       );
       const data = await response.json();
       
-      // For now, we'll simulate the key points extraction since we're using the same endpoint
-      // In a real implementation, this would be a separate endpoint
+      // Process the response into individual key points
       const points = data.summary
         .split('\n')
         .filter((line: string) => line.trim().length > 0)
+        .map((line: string) => line.replace(/^\d+[\.\)]\s*/, '')) // Remove any numbering from the lines
+        .filter((line: string) => line.length > 0) // Remove any empty lines
         .slice(0, maxPoints);
       
       return { keyPoints: points };

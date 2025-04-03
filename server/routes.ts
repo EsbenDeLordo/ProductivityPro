@@ -12,7 +12,8 @@ import {
   generateAssistantResponse, 
   generateProjectSuggestions,
   generateProductivityRecommendations,
-  summarizeContent
+  summarizeContent,
+  extractKeyPoints
 } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -451,21 +452,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let summary;
       
       if (format === 'key_points') {
-        // Add instruction to format as key points in the actual call to OpenAI
-        summary = await summarizeContent(
-          `Extract the ${maxPoints || 5} most important key points from this content. Format as a numbered list with one key point per line:\n\n${content}`,
-          maxLength || 1000
-        );
+        // Use dedicated key points extraction function
+        summary = await extractKeyPoints(content, maxPoints || 5);
       } else {
-        summary = await summarizeContent(
-          content,
-          maxLength || 500
-        );
+        summary = await summarizeContent(content, maxLength || 500);
       }
       
       res.json({ summary });
     } catch (error) {
-      res.status(500).json({ message: "Failed to summarize content" });
+      console.error("API error:", error);
+      res.status(500).json({ message: "Failed to process content" });
     }
   });
 

@@ -550,6 +550,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 className="w-full justify-start text-destructive hover:text-destructive"
                 onClick={async () => {
                   try {
+                    const { deleteProject } = useProjects();
                     await deleteProject(project.id);
                     toast({
                       title: "Project deleted",

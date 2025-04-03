@@ -7,6 +7,8 @@ import {
   assistantMessages, type AssistantMessage, type InsertAssistantMessage,
   dailyAnalytics, type DailyAnalytics, type InsertDailyAnalytics
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, isNull, gte, lt, desc, asc } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -610,4 +612,322 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getProjects(userId: number): Promise<Project[]> {
+    return db.select().from(projects).where(eq(projects.userId, userId));
+  }
+
+  async getProject(id: number): Promise<Project | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project || undefined;
+  }
+
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const [project] = await db
+      .insert(projects)
+      .values(insertProject)
+      .returning();
+    return project;
+  }
+
+  async updateProject(id: number, projectUpdate: Partial<Project>): Promise<Project> {
+    const [project] = await db
+      .update(projects)
+      .set(projectUpdate)
+      .where(eq(projects.id, id))
+      .returning();
+    return project;
+  }
+
+  async deleteProject(id: number): Promise<boolean> {
+    const result = await db
+      .delete(projects)
+      .where(eq(projects.id, id))
+      .returning({ id: projects.id });
+    return result.length > 0;
+  }
+
+  async getProjectTemplates(): Promise<ProjectTemplate[]> {
+    return db.select().from(projectTemplates);
+  }
+
+  async getProjectTemplate(id: number): Promise<ProjectTemplate | undefined> {
+    const [template] = await db.select().from(projectTemplates).where(eq(projectTemplates.id, id));
+    return template || undefined;
+  }
+
+  async getProjectTemplateByType(type: string): Promise<ProjectTemplate | undefined> {
+    const [template] = await db.select().from(projectTemplates).where(eq(projectTemplates.type, type));
+    return template || undefined;
+  }
+
+  async createProjectTemplate(insertTemplate: InsertProjectTemplate): Promise<ProjectTemplate> {
+    const [template] = await db
+      .insert(projectTemplates)
+      .values(insertTemplate)
+      .returning();
+    return template;
+  }
+
+  async getWorkSessions(userId: number): Promise<WorkSession[]> {
+    return db.select().from(workSessions).where(eq(workSessions.userId, userId));
+  }
+
+  async getWorkSessionsByProject(projectId: number): Promise<WorkSession[]> {
+    return db.select().from(workSessions).where(eq(workSessions.projectId, projectId));
+  }
+
+  async getCurrentWorkSession(userId: number): Promise<WorkSession | undefined> {
+    const [session] = await db
+      .select()
+      .from(workSessions)
+      .where(and(
+        eq(workSessions.userId, userId),
+        isNull(workSessions.endTime)
+      ))
+      .orderBy(desc(workSessions.startTime))
+      .limit(1);
+    return session || undefined;
+  }
+
+  async createWorkSession(insertSession: InsertWorkSession): Promise<WorkSession> {
+    const [session] = await db
+      .insert(workSessions)
+      .values(insertSession)
+      .returning();
+    return session;
+  }
+
+  async updateWorkSession(id: number, sessionUpdate: Partial<WorkSession>): Promise<WorkSession> {
+    const [session] = await db
+      .update(workSessions)
+      .set(sessionUpdate)
+      .where(eq(workSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  async endWorkSession(id: number): Promise<WorkSession> {
+    const [session] = await db
+      .update(workSessions)
+      .set({ endTime: new Date() })
+      .where(eq(workSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  async getRecommendations(userId: number): Promise<Recommendation[]> {
+    return db.select().from(recommendations).where(eq(recommendations.userId, userId));
+  }
+
+  async createRecommendation(insertRecommendation: InsertRecommendation): Promise<Recommendation> {
+    const [recommendation] = await db
+      .insert(recommendations)
+      .values(insertRecommendation)
+      .returning();
+    return recommendation;
+  }
+
+  async updateRecommendation(id: number, recommendationUpdate: Partial<Recommendation>): Promise<Recommendation> {
+    const [recommendation] = await db
+      .update(recommendations)
+      .set(recommendationUpdate)
+      .where(eq(recommendations.id, id))
+      .returning();
+    return recommendation;
+  }
+
+  async getAssistantMessages(userId: number, projectId?: number): Promise<AssistantMessage[]> {
+    const baseQuery = db.select().from(assistantMessages).where(eq(assistantMessages.userId, userId));
+    
+    if (projectId !== undefined) {
+      return baseQuery
+        .where(eq(assistantMessages.projectId, projectId))
+        .orderBy(asc(assistantMessages.timestamp));
+    }
+    
+    return baseQuery.orderBy(asc(assistantMessages.timestamp));
+  }
+
+  async createAssistantMessage(insertMessage: InsertAssistantMessage): Promise<AssistantMessage> {
+    const [message] = await db
+      .insert(assistantMessages)
+      .values(insertMessage)
+      .returning();
+    return message;
+  }
+
+  async getDailyAnalytics(userId: number, range: number = 7): Promise<DailyAnalytics[]> {
+    const today = new Date();
+    const startDate = new Date();
+    startDate.setDate(today.getDate() - range);
+    
+    // Convert to SQL date strings for comparison
+    const startDateStr = startDate.toISOString().split('T')[0];
+    
+    return db
+      .select()
+      .from(dailyAnalytics)
+      .where(
+        eq(dailyAnalytics.userId, userId)
+      )
+      .orderBy(asc(dailyAnalytics.date));
+  }
+
+  async createOrUpdateDailyAnalytics(insertAnalytics: InsertDailyAnalytics): Promise<DailyAnalytics> {
+    // First try to find if analytics for the date already exists
+    const dateStr: string = typeof insertAnalytics.date === 'string' 
+      ? insertAnalytics.date 
+      : new Date().toISOString().split('T')[0]; // Fallback
+    
+    const [existingAnalytics] = await db
+      .select()
+      .from(dailyAnalytics)
+      .where(
+        eq(dailyAnalytics.userId, insertAnalytics.userId)
+      );
+    
+    if (existingAnalytics) {
+      // Update existing record
+      const [updated] = await db
+        .update(dailyAnalytics)
+        .set(insertAnalytics)
+        .where(eq(dailyAnalytics.id, existingAnalytics.id))
+        .returning();
+      return updated;
+    } else {
+      // Insert new record
+      const [analytics] = await db
+        .insert(dailyAnalytics)
+        .values(insertAnalytics)
+        .returning();
+      return analytics;
+    }
+  }
+
+  // Initialize with default project templates
+  async initializeDefaultData() {
+    // Check if we already have project templates
+    const templates = await this.getProjectTemplates();
+    if (templates.length === 0) {
+      // Create default project templates
+      const videoTemplate: InsertProjectTemplate = {
+        name: "Video Script",
+        type: "video",
+        sections: {
+          description: "Template for creating high-quality video scripts",
+          tasks: [
+            "Research topic",
+            "Create outline",
+            "Write script",
+            "Review and edit",
+            "Finalize"
+          ],
+          estimatedHours: 8
+        }
+      };
+      
+      const researchTemplate: InsertProjectTemplate = {
+        name: "Research Document",
+        type: "research",
+        sections: {
+          description: "Template for creating research documents",
+          tasks: [
+            "Define research question",
+            "Gather sources",
+            "Analyze information",
+            "Draft document",
+            "Review and finalize"
+          ],
+          estimatedHours: 12
+        }
+      };
+      
+      const guideTemplate: InsertProjectTemplate = {
+        name: "How-to Guide",
+        type: "guide",
+        sections: {
+          description: "Template for creating educational guides",
+          tasks: [
+            "Select topic",
+            "Outline key points",
+            "Draft instructions",
+            "Add examples",
+            "Proofread and publish"
+          ],
+          estimatedHours: 6
+        }
+      };
+      
+      const podcastTemplate: InsertProjectTemplate = {
+        name: "Podcast Episode",
+        type: "podcast",
+        sections: {
+          description: "Template for planning podcast episodes",
+          tasks: [
+            "Research topic",
+            "Outline talking points",
+            "Prepare questions",
+            "Record episode",
+            "Edit and publish"
+          ],
+          estimatedHours: 5
+        }
+      };
+      
+      await this.createProjectTemplate(videoTemplate);
+      await this.createProjectTemplate(researchTemplate);
+      await this.createProjectTemplate(guideTemplate);
+      await this.createProjectTemplate(podcastTemplate);
+      
+      // Create a demo user if none exists
+      const demoUser: InsertUser = {
+        username: "demo",
+        email: "demo@example.com",
+        password: "password123", // In a real app, this would be hashed
+        name: "Demo User",
+        avatar: null
+      };
+      
+      try {
+        await this.createUser(demoUser);
+      } catch (error) {
+        // User might already exist, ignore
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.log("Demo user creation error (might already exist):", errorMessage);
+      }
+    }
+  }
+}
+
+// Initialize the storage and run data initialization
+export const storage = new DatabaseStorage();
+
+// Call the initialization method immediately to set up default data
+(async () => {
+  try {
+    await storage.initializeDefaultData();
+    console.log("Database initialized with default data");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error("Failed to initialize database with default data:", errorMessage);
+  }
+})();

@@ -81,11 +81,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Project routes
-  app.get("/api/projects/:userId", async (req, res) => {
-    const userId = parseInt(req.params.userId);
+  app.get("/api/projects", async (req, res) => {
+    const userId = req.query.userId ? parseInt(req.query.userId as string) : null;
     
-    if (isNaN(userId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
+    if (!userId || isNaN(userId)) {
+      return res.status(400).json({ message: "Valid user ID query parameter is required" });
     }
     
     const projects = await storage.getProjects(userId);

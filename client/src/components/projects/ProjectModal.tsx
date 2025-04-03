@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useProjects } from "@/context/ProjectContext";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { insertProjectSchema } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -51,6 +52,7 @@ interface ProjectModalProps {
 export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
   const { createProject } = useProjects();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const userId = 1; // For demo purposes
   
   // Get project templates

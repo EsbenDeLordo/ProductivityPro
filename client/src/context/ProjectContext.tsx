@@ -17,11 +17,16 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
 
-  const { data: projects = [], isLoading, error, refetch } = useQuery<Project[]>({ // Added refetch and adjusted data default
+  const { data: projects = [], isLoading, error } = useQuery<Project[]>({
     queryKey: ['/api/projects', userId],
-    queryFn: ({ queryKey }) => fetch(`${queryKey[0]}/${queryKey[1]}`).then(res => res.json()),
-    refetchOnWindowFocus: true, // Added to improve state management
-    staleTime: 0 // Added to ensure immediate updates
+    queryFn: async () => {
+      const response = await fetch(`/api/projects/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch projects');
+      }
+      return response.json();
+    },
+    refetchInterval: 1000
   });
 
   const createProjectMutation = useMutation({

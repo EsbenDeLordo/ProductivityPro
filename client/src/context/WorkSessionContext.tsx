@@ -30,6 +30,17 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(und
 export function WorkSessionProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
   const [elapsedTime, setElapsedTime] = useState<TimeDisplay>({ hours: 0, minutes: 0, seconds: 0 });
+  const [isSessionActive, setIsSessionActive] = useState(false);
+
+  // Reset timer when session ends
+  useEffect(() => {
+    if (!currentSession || currentSession.endTime) {
+      setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
+      setIsSessionActive(false);
+    } else {
+      setIsSessionActive(true);
+    }
+  }, [currentSession]);
   const timerRef = useRef<NodeJS.Timeout>();
 
   // Get current session
@@ -115,7 +126,7 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
       error: error as Error, 
       startSession, 
       endSession,
-      isSessionActive: !!currentSession
+      isSessionActive
     }}>
       {children}
     </WorkSessionContext.Provider>

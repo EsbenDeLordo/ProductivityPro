@@ -21,7 +21,7 @@ interface ProjectDetailProps {
 
 export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDetailProps) {
   const { toast } = useToast();
-  const { currentSession, startSession, endSession, isSessionActive } = useWorkSession();
+  const { currentSession, startSession, endSession, isSessionActive, elapsedTime } = useWorkSession();
   const [activeTab, setActiveTab] = useState("overview");
   const [progress, setProgress] = useState(project.progress);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);

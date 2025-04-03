@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "mock-key-for-development" });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? "mock-key-for-development" });
 
 export async function generateProjectSuggestions(projectType: string, projectName: string, projectDescription: string) {
   try {
@@ -21,7 +21,7 @@ export async function generateProjectSuggestions(projectType: string, projectNam
       response_format: { type: "json_object" },
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    return JSON.parse(response.choices[0].message.content ?? '{}');
   } catch (error) {
     console.error("Error generating project suggestions:", error);
     return {
@@ -50,7 +50,7 @@ export async function analyzeContent(content: string) {
       response_format: { type: "json_object" },
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    return JSON.parse(response.choices[0].message.content ?? '{}');
   } catch (error) {
     console.error("Error analyzing content:", error);
     return {
@@ -58,6 +58,30 @@ export async function analyzeContent(content: string) {
       suggestions: [],
       keyPoints: []
     };
+  }
+}
+
+export async function summarizeContent(content: string, maxLength: number = 500) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content:
+            `You are an AI assistant specialized in summarizing content. Create a concise summary of the provided content within approximately ${maxLength} characters. The summary should be clear, readable, and capture the main points.`,
+        },
+        {
+          role: "user",
+          content: content,
+        },
+      ]
+    });
+
+    return response.choices[0].message.content ?? "";
+  } catch (error) {
+    console.error("Error summarizing content:", error);
+    return "Unable to generate summary at this time.";
   }
 }
 
@@ -80,7 +104,7 @@ export async function generateAssistantResponse(userId: number, projectId: numbe
       ]
     });
 
-    return response.choices[0].message.content;
+    return response.choices[0].message.content ?? "";
   } catch (error) {
     console.error("Error generating assistant response:", error);
     return "I'm having trouble processing your request right now. Please try again later.";
@@ -111,7 +135,7 @@ export async function generateProductivityRecommendations(userId: number, workDa
       response_format: { type: "json_object" },
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    return JSON.parse(response.choices[0].message.content ?? '[]');
   } catch (error) {
     console.error("Error generating productivity recommendations:", error);
     return [];

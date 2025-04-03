@@ -11,7 +11,8 @@ import {
 import { 
   generateAssistantResponse, 
   generateProjectSuggestions,
-  generateProductivityRecommendations 
+  generateProductivityRecommendations,
+  summarizeContent
 } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -384,7 +385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const assistantMessage = await storage.createAssistantMessage({
           userId: messageData.userId,
           projectId: messageData.projectId,
-          content: aiResponse,
+          content: aiResponse ?? "",
           sender: "assistant"
         });
         
@@ -435,6 +436,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(suggestions);
     } catch (error) {
       res.status(500).json({ message: "Failed to generate project suggestions" });
+    }
+  });
+  
+  // Content summarization route
+  app.post("/api/summarize", async (req, res) => {
+    const { content, maxLength } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ message: "Content is required" });
+    }
+    
+    try {
+      const summary = await summarizeContent(
+        content,
+        maxLength || 500
+      );
+      
+      res.json({ summary });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to summarize content" });
     }
   });
 

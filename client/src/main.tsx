@@ -4,13 +4,17 @@ import "./index.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ProjectProvider } from "@/context/ProjectContext";
 import { WorkSessionProvider } from "@/context/WorkSessionContext";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider>
-    <ProjectProvider>
-      <WorkSessionProvider>
-        <App />
-      </WorkSessionProvider>
-    </ProjectProvider>
-  </ThemeProvider>
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
+      <ProjectProvider>
+        <WorkSessionProvider>
+          <App />
+        </WorkSessionProvider>
+      </ProjectProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
 );

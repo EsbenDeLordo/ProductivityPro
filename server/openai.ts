@@ -111,7 +111,7 @@ async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
         return `{"error": false, "message": "Using fallback response", "data": {"status": "mock"}}`;
       }
     } else {
-      return "I'm currently using a fallback response mode. For the best experience, please ensure your DeepSeek API key is valid and your internet connection is stable.";
+      return "I'm currently in demo mode with limited capabilities. For the full AI experience, please ask the administrator to add a DeepSeek API key to the server environment variables.";
     }
   }
 }

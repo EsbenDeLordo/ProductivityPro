@@ -107,11 +107,11 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
         timeLogged: 0
       });
       
+      queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
+        return Array.isArray(oldData) ? [...oldData, newProject] : [newProject];
+      });
       await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
-      await queryClient.invalidateQueries({ queryKey: ['/api/projects/1'] });
-      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
       await queryClient.refetchQueries({ queryKey: ['/api/projects'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/projects/1'] });
       
       toast({
         title: "Project created",

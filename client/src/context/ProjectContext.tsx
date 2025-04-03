@@ -24,9 +24,13 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
-      return response.json();
+      const data = await response.json();
+      console.log('Fetched projects:', data);
+      return Array.isArray(data) ? data : [];
     },
-    refetchInterval: 1000
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0
   });
 
   const createProjectMutation = useMutation({

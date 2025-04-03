@@ -128,6 +128,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
           });
         }
       } else if (!isSessionActive && project.id) {
+        const now = new Date();
         await startSession(project.id, "focus");
         toast({
           title: "Session started",
@@ -138,7 +139,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       console.error('Session error:', error);
       toast({
         title: "Error",
-        description: "Failed to manage work session",
+        description: error instanceof Error ? error.message : "Failed to manage work session",
         variant: "destructive"
       });
     }

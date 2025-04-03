@@ -107,7 +107,9 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
 
   // Handle edit project
   const handleEditProject = () => {
-    setIsProjectModalOpen(true);
+    if (project) {
+      setIsProjectModalOpen(true);
+    }
   };
 
   // Calculate days until deadline

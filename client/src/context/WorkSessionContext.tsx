@@ -10,6 +10,7 @@ interface TimeLogged {
 }
 
 interface WorkSessionContextType {
+  elapsedTime: number;
   currentSession: WorkSession | null;
   isLoading: boolean;
   error: Error | null;
@@ -22,6 +23,8 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(und
 
 export function WorkSessionProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout>();
 
   const { data: currentSession, isLoading, error } = useQuery<WorkSession | null>({
     queryKey: ['/api/work-session/current', userId],

@@ -106,7 +106,14 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
     try {
       if (project) {
         // Update existing project
-        const updatedProject = await apiRequest('PUT', `/api/project/${project.id}`, data);
+        const updatedProject = await apiRequest('PUT', `/api/project/${project.id}`, {
+          ...data,
+          id: project.id,
+          userId: project.userId,
+          status: project.status,
+          timeLogged: project.timeLogged,
+          files: project.files
+        });
         queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
           return Array.isArray(oldData) 
             ? oldData.map(p => p.id === project.id ? updatedProject : p)

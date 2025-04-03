@@ -98,7 +98,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   });
 
   // Format time logged (minutes to hours and minutes)
-  const formatTimeLogged = (minutes: number) => {
+  const formatTimeLogged = (minutes: number = 0) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;

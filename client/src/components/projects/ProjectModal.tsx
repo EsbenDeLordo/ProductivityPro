@@ -103,9 +103,10 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
         description: "Your new project has been created successfully."
       });
       form.reset();
-      onClose();
       // Force a refresh of the projects list
+      await queryClient.invalidateQueries({ queryKey: [`/api/projects/${data.userId}`] });
       await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      onClose();
     } catch (error) {
       toast({
         title: "Error",

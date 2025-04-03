@@ -111,22 +111,37 @@ async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
       }
     }
     
-    const response = await axios.post(
-      "https://api.deepseek.com/v1/chat/completions",
-      {
-        model: "deepseek-chat",
-        messages: messages,
-        response_format: jsonFormat ? { type: "json_object" } : undefined,
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
-          "Content-Type": "application/json",
+    // Making the API call with better error handling
+    try {
+      const response = await axios.post(
+        "https://api.deepseek.com/v1/chat/completions",
+        {
+          model: "deepseek-chat",
+          messages: messages,
+          response_format: jsonFormat ? { type: "json_object" } : undefined,
         },
+        {
+          headers: {
+            "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      // removed duplicate return
+    } catch (apiError: any) {
+      console.error("DeepSeek API error details:", 
+        apiError.response?.status,
+        apiError.response?.data
+      );
+      
+      // If payment required error, provide a clear message
+      if (apiError.response?.status === 402) {
+        throw new Error("DeepSeek API subscription issue: Payment required. The API key may have billing issues.");
       }
-    );
-    
-    return response.data.choices[0].message.content;
+      
+      throw apiError; // Rethrow for the outer catch block to handle
+    }
   } catch (error) {
     console.error("Error calling DeepSeek API:", error);
     

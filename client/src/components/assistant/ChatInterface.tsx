@@ -213,20 +213,22 @@ export default function ChatInterface() {
     mutationFn: async () => {
       if (!selectedProjectId) return;
       
-      // In a real app, you'd create an API endpoint for this
-      // For now, we'll just remove it from localStorage
+      // In a real app, you'd create an API endpoint for this that deletes messages from the server
+      // For now, we'll just clear the UI and remove from localStorage 
+      
+      // Remove from conversations list
       const updatedConversations = conversations.filter(c => c.projectId !== selectedProjectId);
       setConversations(updatedConversations);
       localStorage.setItem('conversations', JSON.stringify(updatedConversations));
       
-      // Clear messages from the UI immediately
+      // Clear messages from the UI immediately by setting an empty array
       queryClient.setQueryData(['/api/assistant-messages', userId, selectedProjectId], []);
       
       return { success: true };
     },
     onSuccess: () => {
       toast({
-        title: "Conversation deleted",
+        title: "Conversation cleared",
         description: "All messages in this conversation have been removed."
       });
       setIsDeleteDialogOpen(false);

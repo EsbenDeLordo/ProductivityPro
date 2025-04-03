@@ -131,30 +131,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const existingProject = await storage.getProject(projectId);
+      const project = await storage.getProject(projectId);
       
-      if (!existingProject) {
+      if (!project) {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Remove undefined values to prevent overwriting with null
-      const updateData = Object.fromEntries(
-        Object.entries(req.body).filter(([_, v]) => v !== undefined)
-      );
-
-      const updatedProject = await storage.updateProject(projectId, {
-        ...existingProject,
-        ...updateData,
-        timeLogged: updateData.timeLogged ?? existingProject.timeLogged ?? 0
-      });
-      
+      const updatedProject = await storage.updateProject(projectId, req.body);
       res.json(updatedProject);
     } catch (error) {
-      console.error('Project update error:', error);
-      res.status(500).json({ 
-        message: "Failed to update project",
-        error: error instanceof Error ? error.message : String(error)
-      });
+      res.status(500).json({ message: "Failed to update project" });
     }
   });
 
@@ -248,26 +234,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/work-sessions", async (req, res) => {
     try {
-      const { projectId, type } = req.body;
-      const userId = 1; // For demo purposes
+      const sessionData = insertWorkSessionSchema.parse(req.body);
       
       // Check if there's already an active session for this user
-      const currentSession = await storage.getCurrentWorkSession(userId);
+      const currentSession = await storage.getCurrentWorkSession(sessionData.userId);
       if (currentSession) {
         // End the current session first
         await storage.endWorkSession(currentSession.id);
       }
       
-      const session = await storage.createWorkSession({
-        userId,
-        projectId,
-        startTime: new Date(),
-        type
-      });
-      
+      const session = await storage.createWorkSession(sessionData);
       res.status(201).json(session);
     } catch (error) {
-      console.error('Session creation error:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid session data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to create work session" });
     }
   });

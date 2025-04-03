@@ -106,7 +106,7 @@ export class MemStorage implements IStorage {
         { name: "Notes", description: "General notes and ideas" }
       ]
     };
-
+    
     const researchTemplate: InsertProjectTemplate = {
       name: "Research Paper",
       type: "research",
@@ -118,7 +118,7 @@ export class MemStorage implements IStorage {
         { name: "Conclusions", description: "Insights and implications" }
       ]
     };
-
+    
     const guideTemplate: InsertProjectTemplate = {
       name: "Practical Guide",
       type: "guide",
@@ -130,7 +130,7 @@ export class MemStorage implements IStorage {
         { name: "Case Studies", description: "Real-world applications and examples" }
       ]
     };
-
+    
     const podcastTemplate: InsertProjectTemplate = {
       name: "Podcast Episode",
       type: "podcast",
@@ -156,13 +156,13 @@ export class MemStorage implements IStorage {
       name: "Tadeáš Novák",
       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
     };
-
+    
     const user = this.createUser(demoUser);
 
     // Create sample projects
     const colorCodes = ["#10B981", "#8B5CF6", "#3B82F6"];
     const icons = ["videocam", "menu_book", "psychology"];
-
+    
     const projectData = [
       {
         name: "McMillions Video",
@@ -408,7 +408,7 @@ export class MemStorage implements IStorage {
     if (!project) {
       throw new Error(`Project with id ${id} not found`);
     }
-
+    
     const updatedProject = { ...project, ...projectUpdate };
     this.projects.set(id, updatedProject);
     return updatedProject;
@@ -478,7 +478,7 @@ export class MemStorage implements IStorage {
     if (!session) {
       throw new Error(`Work session with id ${id} not found`);
     }
-
+    
     const updatedSession = { ...session, ...sessionUpdate };
     this.workSessions.set(id, updatedSession);
     return updatedSession;
@@ -489,20 +489,20 @@ export class MemStorage implements IStorage {
     if (!session) {
       throw new Error(`Work session with id ${id} not found`);
     }
-
+    
     const endTime = new Date();
     const startTime = new Date(session.startTime);
     const durationMs = endTime.getTime() - startTime.getTime();
     const durationMinutes = Math.floor(durationMs / (1000 * 60));
-
+    
     const updatedSession = {
       ...session,
       endTime,
       duration: durationMinutes
     };
-
+    
     this.workSessions.set(id, updatedSession);
-
+    
     // Update project timeLogged if projectId is set
     if (session.projectId) {
       const project = this.projects.get(session.projectId);
@@ -514,7 +514,7 @@ export class MemStorage implements IStorage {
         this.projects.set(project.id, updatedProject);
       }
     }
-
+    
     return updatedSession;
   }
 
@@ -542,7 +542,7 @@ export class MemStorage implements IStorage {
     if (!recommendation) {
       throw new Error(`Recommendation with id ${id} not found`);
     }
-
+    
     const updatedRecommendation = { ...recommendation, ...recommendationUpdate };
     this.recommendations.set(id, updatedRecommendation);
     return updatedRecommendation;
@@ -578,7 +578,7 @@ export class MemStorage implements IStorage {
     const userAnalytics = Array.from(this.dailyAnalytics.values()).filter(
       (analytics) => analytics.userId === userId
     );
-
+    
     // Sort by date descending and limit to range
     return userAnalytics
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -590,7 +590,7 @@ export class MemStorage implements IStorage {
     const existingAnalytics = Array.from(this.dailyAnalytics.values()).find(
       (analytics) => analytics.userId === insertAnalytics.userId && analytics.date === insertAnalytics.date
     );
-
+    
     if (existingAnalytics) {
       // Update existing analytics
       const updatedAnalytics = {
@@ -727,41 +727,11 @@ export class DatabaseStorage implements IStorage {
 
   async endWorkSession(id: number): Promise<WorkSession> {
     const [session] = await db
-      .select()
-      .from(workSessions)
-      .where(eq(workSessions.id, id))
-      .limit(1);
-
-    if (!session) {
-      throw new Error(`Work session with id ${id} not found`);
-    }
-
-    const endTime = new Date();
-    const startTime = new Date(session.startTime);
-    const durationInMinutes = Math.floor((endTime.getTime() - startTime.getTime()) / (1000 * 60));
-
-    // Update the session
-    const [updatedSession] = await db
       .update(workSessions)
-      .set({ 
-        endTime,
-        duration: durationInMinutes
-      })
+      .set({ endTime: new Date() })
       .where(eq(workSessions.id, id))
       .returning();
-
-    // Update the project's total time logged (store as seconds)
-    if (session.projectId) {
-      const [project] = await db.select().from(projects).where(eq(projects.id, session.projectId)).limit(1);
-      if (project) {
-        const newTimeLogged = (project.timeLogged || 0) + durationInSeconds;
-        await this.updateProject(session.projectId, { 
-          timeLogged: Math.floor(newTimeLogged)
-        });
-      }
-    }
-
-    return updatedSession;
+    return session;
   }
 
   async getRecommendations(userId: number): Promise<Recommendation[]> {
@@ -787,13 +757,13 @@ export class DatabaseStorage implements IStorage {
 
   async getAssistantMessages(userId: number, projectId?: number): Promise<AssistantMessage[]> {
     const baseQuery = db.select().from(assistantMessages).where(eq(assistantMessages.userId, userId));
-
+    
     if (projectId !== undefined) {
       return baseQuery
         .where(eq(assistantMessages.projectId, projectId))
         .orderBy(asc(assistantMessages.timestamp));
     }
-
+    
     return baseQuery.orderBy(asc(assistantMessages.timestamp));
   }
 
@@ -809,10 +779,10 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     const startDate = new Date();
     startDate.setDate(today.getDate() - range);
-
+    
     // Convert to SQL date strings for comparison
     const startDateStr = startDate.toISOString().split('T')[0];
-
+    
     return db
       .select()
       .from(dailyAnalytics)
@@ -827,14 +797,14 @@ export class DatabaseStorage implements IStorage {
     const dateStr: string = typeof insertAnalytics.date === 'string' 
       ? insertAnalytics.date 
       : new Date().toISOString().split('T')[0]; // Fallback
-
+    
     const [existingAnalytics] = await db
       .select()
       .from(dailyAnalytics)
       .where(
         eq(dailyAnalytics.userId, insertAnalytics.userId)
       );
-
+    
     if (existingAnalytics) {
       // Update existing record
       const [updated] = await db
@@ -874,7 +844,7 @@ export class DatabaseStorage implements IStorage {
           estimatedHours: 8
         }
       };
-
+      
       const researchTemplate: InsertProjectTemplate = {
         name: "Research Document",
         type: "research",
@@ -890,7 +860,7 @@ export class DatabaseStorage implements IStorage {
           estimatedHours: 12
         }
       };
-
+      
       const guideTemplate: InsertProjectTemplate = {
         name: "How-to Guide",
         type: "guide",
@@ -906,7 +876,7 @@ export class DatabaseStorage implements IStorage {
           estimatedHours: 6
         }
       };
-
+      
       const podcastTemplate: InsertProjectTemplate = {
         name: "Podcast Episode",
         type: "podcast",
@@ -922,12 +892,12 @@ export class DatabaseStorage implements IStorage {
           estimatedHours: 5
         }
       };
-
+      
       await this.createProjectTemplate(videoTemplate);
       await this.createProjectTemplate(researchTemplate);
       await this.createProjectTemplate(guideTemplate);
       await this.createProjectTemplate(podcastTemplate);
-
+      
       // Create a demo user if none exists
       const demoUser: InsertUser = {
         username: "demo",
@@ -936,7 +906,7 @@ export class DatabaseStorage implements IStorage {
         name: "Tadeáš Novák",
         avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
       };
-
+      
       try {
         await this.createUser(demoUser);
       } catch (error) {

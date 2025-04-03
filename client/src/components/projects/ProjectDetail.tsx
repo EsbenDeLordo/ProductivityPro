@@ -79,18 +79,8 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
     }
   });
 
-  const updateProject = async (updatedData: Partial<Project>) => {
-    try {
-      const result = await updateProjectMutation.mutateAsync({
-        ...project,
-        ...updatedData,
-        timeLogged: project.timeLogged || 0
-      });
-      return result;
-    } catch (error) {
-      console.error('Failed to update project:', error);
-      throw error;
-    }
+  const updateProject = (updatedData: Partial<Project>) => {
+    return updateProjectMutation.mutateAsync(updatedData);
   };
 
   // Send message mutation
@@ -108,7 +98,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   });
 
   // Format time logged (minutes to hours and minutes)
-  const formatTimeLogged = (minutes: number = 0) => {
+  const formatTimeLogged = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;
@@ -137,8 +127,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
             description: "Your work session has been saved."
           });
         }
-      } else if (!isSessionActive && project.id) {
-        const now = new Date();
+      } else if (!isSessionActive) {
         await startSession(project.id, "focus");
         toast({
           title: "Session started",
@@ -149,7 +138,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       console.error('Session error:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to manage work session",
+        description: "Failed to manage work session",
         variant: "destructive"
       });
     }
@@ -157,18 +146,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
 
   // Handle progress update
   const handleProgressUpdate = () => {
-    if (project?.id) {
-      updateProjectMutation.mutate({
-        id: project.id,
-        progress: progress
-      });
-    }
-  };
-
-  const formatTimeLogged = (minutes: number = 0) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+    updateProjectMutation.mutate({ progress });
   };
 
   // Handle message sending
@@ -526,9 +504,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 className="w-full justify-start"
                 onClick={async () => {
                   try {
-                    if (!project.id) return;
                     await updateProject({
-                      id: project.id,
                       name: project.name,
                       description: project.description,
                       type: project.type,

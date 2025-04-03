@@ -47,9 +47,10 @@ type FormData = z.infer<typeof formSchema>;
 interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
+  project?: Project;
 }
 
-export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
+export default function ProjectModal({ isOpen, onClose, project }: ProjectModalProps) {
   const { createProject } = useProjects();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -65,7 +66,10 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
   // Form setup
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: project ? {
+      ...project,
+      deadline: project.deadline || "",
+    } : {
       name: "",
       description: "",
       type: "video",
@@ -99,34 +103,44 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
   
   const onSubmit = async (data: FormData) => {
     try {
-      const newProject = await createProject({
-        ...data,
-        status: 'active',
-        progress: 0,
-        files: 0,
-        timeLogged: 0
-      });
+      if (project) {
+        // Update existing project
+        const updatedProject = await apiRequest('PUT', `/api/project/${project.id}`, data);
+        queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
+          return Array.isArray(oldData) 
+            ? oldData.map(p => p.id === project.id ? updatedProject : p)
+            : [updatedProject];
+        });
+        toast({
+          title: "Project updated",
+          description: "Project has been updated successfully."
+        });
+      } else {
+        // Create new project
+        const newProject = await createProject({
+          ...data,
+          status: 'active',
+          progress: 0,
+          files: 0,
+          timeLogged: 0
+        });
+        queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
+          return Array.isArray(oldData) ? [...oldData, newProject] : [newProject];
+        });
+        toast({
+          title: "Project created",
+          description: "Your new project has been created successfully."
+        });
+      }
       
-      queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
-        return Array.isArray(oldData) ? [...oldData, newProject] : [newProject];
-      });
       await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/projects'] });
-      
-      toast({
-        title: "Project created",
-        description: "Your new project has been created successfully."
-      });
-      
       form.reset();
-      await queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/projects'] });
       onClose();
     } catch (error) {
-      console.error('Failed to create project:', error);
+      console.error('Failed to save project:', error);
       toast({
         title: "Error",
-        description: "Failed to create project. Please try again.",
+        description: `Failed to ${project ? 'update' : 'create'} project. Please try again.`,
         variant: "destructive"
       });
     }
@@ -141,8 +155,15 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
               <span className="material-icons text-primary dark:text-blue-300">add_task</span>
             </div>
             <div>
-              <DialogTitle className="text-lg">Create New Project</DialogTitle>
-              <DialogDescription>Set up a new project with templates and AI assistance</DialogDescription>
+              <DialogTitle className="text-lg">
+                {project ? 'Edit Project' : 'Create New Project'}
+              </DialogTitle>
+              <DialogDescription>
+                {project 
+                  ? 'Update your project details'
+                  : 'Set up a new project with templates and AI assistance'
+                }
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>

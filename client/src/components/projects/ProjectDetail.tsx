@@ -503,29 +503,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
-                onClick={async () => {
-                  try {
-                    if (!project.id) return;
-                    await updateProject({
-                      id: project.id,
-                      name: project.name,
-                      description: project.description,
-                      type: project.type,
-                      deadline: project.deadline || "",
-                      aiAssistanceEnabled: project.aiAssistanceEnabled
-                    });
-                    toast({
-                      title: "Project updated",
-                      description: "Changes have been saved successfully."
-                    });
-                  } catch (error) {
-                    toast({
-                      title: "Error",
-                      description: "Failed to update project",
-                      variant: "destructive"
-                    });
-                  }
-                }}
+                onClick={() => setIsProjectModalOpen(true)}
               >
                 <span className="material-icons mr-2">edit</span>
                 Edit Project

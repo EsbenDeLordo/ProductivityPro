@@ -97,11 +97,17 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
     }
   });
 
-  // Format time logged (minutes to hours and minutes)
-  const formatTimeLogged = (minutes: number = 0) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
+  // Format time logged
+  const formatTimeLogged = (seconds: number = 0) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${minutes}m ${secs}s`;
+  };
+
+  // Handle edit project
+  const handleEditProject = () => {
+    setIsProjectModalOpen(true);
   };
 
   // Calculate days until deadline
@@ -503,7 +509,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
-                onClick={() => setIsProjectModalOpen(true)}
+                onClick={handleEditProject}
               >
                 <span className="material-icons mr-2">edit</span>
                 Edit Project

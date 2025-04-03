@@ -102,6 +102,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
   }, [form.watch("type")]);
   
   const onSubmit = async (data: FormData) => {
+    const isUpdate = !!project;
     try {
       if (project) {
         // Update existing project
@@ -115,6 +116,8 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
           title: "Project updated",
           description: "Project has been updated successfully."
         });
+        // Force a reload to ensure all data is fresh
+        window.location.reload();
       } else {
         // Create new project
         const newProject = await createProject({

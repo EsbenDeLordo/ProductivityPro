@@ -1,7 +1,13 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { WorkSession } from "@shared/schema";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+
+interface TimeLogged {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
 
 interface WorkSessionContextType {
   currentSession: WorkSession | null;

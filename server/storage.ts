@@ -736,16 +736,16 @@ export class DatabaseStorage implements IStorage {
       throw new Error(`Work session with id ${id} not found`);
     }
 
-    const endTime = new Date().toISOString();
+    const endTime = new Date();
     const startTime = new Date(session.startTime);
-    const durationInSeconds = Math.floor((new Date(endTime).getTime() - startTime.getTime()) / 1000);
+    const durationInMinutes = Math.floor((endTime.getTime() - startTime.getTime()) / (1000 * 60));
 
     // Update the session
     const [updatedSession] = await db
       .update(workSessions)
       .set({ 
         endTime,
-        duration: durationInSeconds 
+        duration: durationInMinutes
       })
       .where(eq(workSessions.id, id))
       .returning();

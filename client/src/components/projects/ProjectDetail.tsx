@@ -165,17 +165,10 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
     }
   };
 
-  const formatTimeWithSeconds = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-    
-    const parts = [];
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}m`);
-    if (remainingSeconds > 0 || parts.length === 0) parts.push(`${remainingSeconds}s`);
-    
-    return parts.join(' ');
+  const formatTimeLogged = (minutes: number = 0) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
   // Handle message sending
@@ -280,7 +273,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Time Logged</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{formatTimeWithSeconds(project.timeLogged)}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{formatTimeLogged(project.timeLogged)}</p>
                     </div>
                   </div>
                 </CardContent>

@@ -20,7 +20,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const { data: projects = [], isLoading, error } = useQuery<Project[]>({
     queryKey: ['/api/projects', userId],
     queryFn: async () => {
-      const response = await fetch(`/api/projects/${userId}`);
+      const response = await fetch(`/api/projects?userId=${userId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }

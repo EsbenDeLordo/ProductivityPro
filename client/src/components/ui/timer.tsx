@@ -11,7 +11,7 @@ interface TimerProps {
 
 export function Timer({ 
   duration, 
-  elapsed, 
+  elapsed: initialElapsed, 
   isRunning, 
   className = "", 
   showText = true, 
@@ -19,18 +19,47 @@ export function Timer({
 }: TimerProps) {
   const [progress, setProgress] = useState(0);
   const [displayTime, setDisplayTime] = useState("");
+  const [elapsed, setElapsed] = useState(initialElapsed);
 
   useEffect(() => {
-    // Calculate progress as a percentage
-    const progressPercentage = Math.min(100, (elapsed / duration) * 100);
+    let intervalId: NodeJS.Timeout;
+
+    if (isRunning) {
+      intervalId = setInterval(() => {
+        setElapsed(prev => {
+          const newElapsed = prev + 1;
+          // Calculate progress as a percentage
+          const progressPercentage = Math.min(100, (newElapsed / duration) * 100);
+          setProgress(progressPercentage);
+          
+          // Format time for display (MM:SS)
+          const remainingSeconds = Math.max(0, duration - newElapsed);
+          const minutes = Math.floor(remainingSeconds / 60);
+          const seconds = Math.floor(remainingSeconds % 60);
+          setDisplayTime(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+          
+          return newElapsed;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isRunning, duration]);
+
+  // Initial render
+  useEffect(() => {
+    const progressPercentage = Math.min(100, (initialElapsed / duration) * 100);
     setProgress(progressPercentage);
     
-    // Format time for display (MM:SS)
-    const remainingSeconds = Math.max(0, duration - elapsed);
+    const remainingSeconds = Math.max(0, duration - initialElapsed);
     const minutes = Math.floor(remainingSeconds / 60);
     const seconds = Math.floor(remainingSeconds % 60);
     setDisplayTime(`${minutes}:${seconds.toString().padStart(2, '0')}`);
-  }, [duration, elapsed]);
+  }, [initialElapsed, duration]);
 
   // Calculate the dimensions based on size
   const getSize = () => {

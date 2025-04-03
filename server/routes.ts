@@ -234,21 +234,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/work-sessions", async (req, res) => {
     try {
-      const sessionData = insertWorkSessionSchema.parse(req.body);
+      const { projectId, type } = req.body;
+      const userId = 1; // For demo purposes
       
       // Check if there's already an active session for this user
-      const currentSession = await storage.getCurrentWorkSession(sessionData.userId);
+      const currentSession = await storage.getCurrentWorkSession(userId);
       if (currentSession) {
         // End the current session first
         await storage.endWorkSession(currentSession.id);
       }
       
-      const session = await storage.createWorkSession(sessionData);
+      const session = await storage.createWorkSession({
+        userId,
+        projectId,
+        startTime: new Date(),
+        type
+      });
+      
       res.status(201).json(session);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid session data", errors: error.errors });
-      }
+      console.error('Session creation error:', error);
       res.status(500).json({ message: "Failed to create work session" });
     }
   });

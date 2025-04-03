@@ -26,6 +26,7 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef<NodeJS.Timeout>();
 
+  // Get current session
   const { data: currentSession, isLoading, error } = useQuery<WorkSession | null>({
     queryKey: ['/api/work-session/current', userId],
     queryFn: ({ queryKey }) => fetch(`${queryKey[0]}/${queryKey[1]}`).then(res => {
@@ -70,9 +71,31 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
     return endSessionMutation.mutateAsync(currentSession.id);
   };
 
+  // Update elapsed time every second when session is active
+  useEffect(() => {
+    if (currentSession && !currentSession.endTime) {
+      const startTime = new Date(currentSession.startTime).getTime();
+      
+      // Set initial elapsed time
+      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+      
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    }
+  }, [currentSession]);
+
   return (
     <WorkSessionContext.Provider value={{ 
-      currentSession: currentSession || null, 
+      currentSession: currentSession || null,
+      elapsedTime,
       isLoading, 
       error: error as Error, 
       startSession, 

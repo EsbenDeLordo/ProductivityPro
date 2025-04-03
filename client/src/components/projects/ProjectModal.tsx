@@ -107,12 +107,9 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
       if (project) {
         // Update existing project
         const updatedProject = await apiRequest('PUT', `/api/project/${project.id}`, {
+          ...project,
           ...data,
-          id: project.id,
-          userId: project.userId,
-          status: project.status,
-          timeLogged: project.timeLogged,
-          files: project.files
+          id: project.id
         });
         queryClient.setQueryData(['/api/projects', userId], (oldData: any) => {
           return Array.isArray(oldData) 
@@ -288,7 +285,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
                 type="submit"
                 disabled={isSubmitting}
               >
-                Create Project
+                {project ? 'Update Project' : 'Create Project'}
               </Button>
             </DialogFooter>
           </form>

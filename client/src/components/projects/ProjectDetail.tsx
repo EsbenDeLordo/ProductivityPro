@@ -217,10 +217,29 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
                 </CardContent>
               </Card>
 
-              {template && template.sections && Array.isArray(template.sections) && (
+              {template && template.sections && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Project Sections</CardTitle>
+                    <CardContent className="pt-4">
+                      {Array.isArray(template.sections) ? (
+                        template.sections.map((section, index) => (
+                          <div key={index} className="mb-4">
+                            <h3 className="font-medium">{section.name}</h3>
+                            <p className="text-sm text-gray-500">{section.description}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div>
+                          <h3 className="font-medium">Tasks</h3>
+                          <ul className="list-disc pl-4 mt-2">
+                            {template.sections.tasks.map((task: string, index: number) => (
+                              <li key={index} className="text-sm text-gray-600">{task}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </CardContent>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

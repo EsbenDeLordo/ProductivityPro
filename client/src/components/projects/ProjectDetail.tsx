@@ -459,19 +459,76 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setIsProjectModalOpen(true)}
+              >
                 <span className="material-icons mr-2">edit</span>
                 Edit Project
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={async () => {
+                  try {
+                    const newProject = await createProject({
+                      ...project,
+                      name: `${project.name} (Copy)`,
+                      userId: project.userId
+                    });
+                    toast({
+                      title: "Project duplicated",
+                      description: "A copy of the project has been created."
+                    });
+                    onClose();
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to duplicate project",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              >
                 <span className="material-icons mr-2">content_copy</span>
                 Duplicate
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => {
+                  // Copy project URL to clipboard
+                  navigator.clipboard.writeText(window.location.href);
+                  toast({
+                    title: "Link copied",
+                    description: "Project link copied to clipboard"
+                  });
+                }}
+              >
                 <span className="material-icons mr-2">share</span>
                 Share
               </Button>
-              <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-destructive hover:text-destructive"
+                onClick={async () => {
+                  try {
+                    await deleteProject(project.id);
+                    toast({
+                      title: "Project deleted",
+                      description: "The project has been permanently deleted."
+                    });
+                    onClose();
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to delete project",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              >
                 <span className="material-icons mr-2">delete</span>
                 Delete
               </Button>

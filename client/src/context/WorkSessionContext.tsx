@@ -16,7 +16,7 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(und
 
 export function WorkSessionProvider({ children }: { children: React.ReactNode }) {
   const userId = 1; // For demo purposes
-  
+
   const { data: currentSession, isLoading, error } = useQuery<WorkSession | null>({
     queryKey: ['/api/work-session/current', userId],
     queryFn: ({ queryKey }) => fetch(`${queryKey[0]}/${queryKey[1]}`).then(res => {
@@ -47,7 +47,7 @@ export function WorkSessionProvider({ children }: { children: React.ReactNode })
     return startSessionMutation.mutateAsync({
       userId,
       projectId,
-      startTime: new Date().toISOString(),
+      startTime: new Date(), //Corrected Date object instead of ISOString
       type
     });
   };

@@ -47,7 +47,7 @@ async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
               {"name": "Create content structure", "section": "Outline", "priority": "Medium"},
               {"name": "Write first draft", "section": "Draft", "priority": "Medium"}
             ],
-            "resources": ["Huberman Lab podcast episodes", "Scientific journals", "Online courses"]
+            "resources": ["Productivity podcasts", "Scientific journals", "Online courses"]
           }`;
         } else {
           return `{"status": "mock", "message": "This is a mock response. For actual AI responses, please provide a valid DeepSeek API key."}`;
@@ -57,11 +57,11 @@ async function callDeepSeekAPI(messages: any[], jsonFormat: boolean = false) {
         if (userQuery.includes("analyze") || userQuery.includes("summarize")) {
           return "This is a mock content analysis. The content appears to be about productivity and work management. Key points include the importance of regular breaks, proper hydration, and strategic planning of tasks. For detailed AI analysis, please provide a valid DeepSeek API key.";
         } else if (userQuery.includes("help") || userQuery.includes("project")) {
-          return "I can help with project organization! Consider breaking your project into clear phases: Research, Planning, Execution, and Review. For each phase, define specific deliverables and timelines. Use the built-in project tools to track progress. For more personalized assistance, please provide a valid DeepSeek API key.";
+          return "I can help with project organization! Consider breaking your project into clear phases: Research, Planning, Execution, and Review. For each phase, define specific deliverables and timelines. Use the built-in project tools in Pocket WinDryft Pro to track progress. For more personalized assistance, please provide a valid DeepSeek API key.";
         } else if (userQuery.includes("idea")) {
-          return "Here are some mock project ideas: 1) Create a morning routine optimization guide based on Huberman Lab research, 2) Develop a tracking system for your key performance metrics, 3) Design a custom note-taking template for podcast insights. For personalized ideas, please provide a valid DeepSeek API key.";
+          return "Here are some project ideas: 1) Create a high-performance morning routine optimization guide, 2) Develop a tracking system for your key performance metrics, 3) Design a custom note-taking template for meeting insights. For personalized ideas, please provide a valid DeepSeek API key.";
         } else {
-          return "This is a mock response because no DeepSeek API key is set. For real AI-powered assistance, please provide a valid API key in your environment settings.";
+          return "Welcome to Pocket WinDryft Pro! This is a mock response because no DeepSeek API key is set. For real AI-powered assistance, please provide a valid API key in your environment settings.";
         }
       }
     }
@@ -155,7 +155,7 @@ export async function generateProjectSuggestions(projectType: string, projectNam
           { name: "Gather materials", section: "Research", priority: "Medium" },
           { name: "Create outline", section: "Planning", priority: "Medium" }
         ],
-        resources: ["Productivity books", "Online tutorials", "Huberman Lab podcasts"]
+        resources: ["Productivity books", "Online tutorials", "Research podcasts"]
       };
     }
   } catch (error) {
@@ -256,7 +256,7 @@ export async function generateAssistantResponse(userId: number, projectId: numbe
       {
         role: "system",
         content:
-          `You are an AI assistant in a productivity app called Pocket Huberman Pro. 
+          `You are an AI assistant in a productivity app called Pocket WinDryft Pro. 
           You help users with their projects by providing suggestions, organizing information, and answering questions.
           Context about the current project: ${context}`,
       },
@@ -279,13 +279,13 @@ export async function generateProductivityRecommendations(userId: number, workDa
       {
         role: "system",
         content:
-          `You are an AI assistant in a productivity app called Pocket Huberman Pro.
+          `You are an AI assistant in a productivity app called Pocket WinDryft Pro.
           Generate 1-3 personalized productivity recommendations based on the user's work data.
           Respond with JSON in the format: 
           [{ "type": string, "title": string, "description": string, "icon": string, "actionText": string, "secondaryActionText": string }]
           
           For icon, use one of: tips_and_updates, local_drink, fitness_center, psychology, hotel, visibility, schedule, brightness_5
-          Keep recommendations brief, practical and science-based (inspired by Andrew Huberman's approach to productivity).`,
+          Keep recommendations brief, practical and science-based (focused on high-performance productivity techniques).`,
       },
       {
         role: "user",

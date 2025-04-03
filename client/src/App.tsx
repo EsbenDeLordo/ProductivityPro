@@ -17,14 +17,14 @@ function App() {
   const [user, setUser] = useState({
     id: 1,
     username: "demo",
-    name: "Andrew Huberman",
-    email: "andrew@hubermanlab.com",
+    name: "Tadeáš Novák",
+    email: "",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces",
     password: "password123" // Adding password to satisfy TypeScript type requirements
   });
 
   useEffect(() => {
-    document.title = "Pocket Huberman Pro";
+    document.title = "Pocket WinDryft Pro";
   }, []);
 
   return (

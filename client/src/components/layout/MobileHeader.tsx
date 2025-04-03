@@ -29,7 +29,7 @@ export default function MobileHeader({ user }: MobileHeaderProps) {
       case "/content-tools":
         return "Content Tools";
       default:
-        return "Pocket Huberman Pro";
+        return "Pocket WinDryft Pro";
     }
   };
 
@@ -47,7 +47,7 @@ export default function MobileHeader({ user }: MobileHeaderProps) {
           </SheetContent>
         </Sheet>
         <h1 className="text-lg font-semibold">
-          <span className="text-primary">Pocket</span>&nbsp;Huberman Pro
+          <span className="text-primary">Pocket</span>&nbsp;WinDryft Pro
         </h1>
         <div className="flex items-center">
           <button 

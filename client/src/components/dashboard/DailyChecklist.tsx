@@ -31,7 +31,7 @@ interface ChecklistData {
 
 type ChecklistCategory = 'health' | 'work' | 'personal' | 'other';
 
-// Default checklist based on Huberman recommendations
+// Default checklist based on neuroscience recommendations
 const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: '1',

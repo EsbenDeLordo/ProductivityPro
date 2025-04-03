@@ -5,7 +5,7 @@ import ProjectModal from "@/components/projects/ProjectModal";
 import Overview from "@/components/dashboard/Overview";
 import ProjectsList from "@/components/dashboard/ProjectsList";
 import WorkAnalytics from "@/components/dashboard/WorkAnalytics";
-import HubermanRecommendations from "@/components/dashboard/HubermanRecommendations";
+import WinDryftRecommendations from "@/components/dashboard/WinDryftRecommendations";
 import AssistantChat from "@/components/dashboard/AssistantChat";
 import PomodoroTimer from "@/components/dashboard/PomodoroTimer";
 import DailyChecklist from "@/components/dashboard/DailyChecklist";
@@ -20,7 +20,7 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Welcome back, Andrew. Here's your productivity overview.</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Welcome back, Tadeáš. Here's your productivity overview.</p>
         </div>
         <div className="mt-4 md:mt-0 flex space-x-3">
           <Button 
@@ -60,7 +60,7 @@ export default function Dashboard() {
         </div>
         
         <div className="space-y-6">
-          <HubermanRecommendations />
+          <WinDryftRecommendations />
           <AssistantChat />
         </div>
       </div>

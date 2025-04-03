@@ -152,8 +152,8 @@ export class MemStorage implements IStorage {
     const demoUser: InsertUser = {
       username: "demo",
       password: "password",
-      email: "demo@example.com",
-      name: "Andrew Huberman",
+      email: "",
+      name: "Tadeáš Novák",
       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
     };
     
@@ -901,10 +901,10 @@ export class DatabaseStorage implements IStorage {
       // Create a demo user if none exists
       const demoUser: InsertUser = {
         username: "demo",
-        email: "demo@example.com",
+        email: "",
         password: "password123", // In a real app, this would be hashed
-        name: "Demo User",
-        avatar: null
+        name: "Tadeáš Novák",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
       };
       
       try {

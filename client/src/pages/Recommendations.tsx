@@ -8,7 +8,7 @@ export default function Recommendations() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pocket Huberman Mode</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pocket WinDryft Mode</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Personalized productivity recommendations based on neuroscience</p>
       </div>
       
@@ -21,12 +21,12 @@ export default function Recommendations() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>About Huberman Mode</CardTitle>
+              <CardTitle>About WinDryft Mode</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Pocket Huberman Mode provides science-based recommendations to optimize your productivity, 
-                focus, and well-being throughout your workday, inspired by Dr. Andrew Huberman's research on neuroscience and performance.
+                Pocket WinDryft Mode provides science-based recommendations to optimize your productivity, 
+                focus, and well-being throughout your workday, inspired by cutting-edge research on neuroscience and performance.
               </p>
             </CardContent>
           </Card>

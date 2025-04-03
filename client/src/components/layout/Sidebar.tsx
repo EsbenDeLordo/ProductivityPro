@@ -28,7 +28,7 @@ export default function Sidebar({ user }: SidebarProps) {
     <aside className="hidden md:flex md:flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between px-4 h-16 border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-lg font-semibold flex items-center">
-          <span className="text-primary">Pocket</span>&nbsp;Huberman Pro
+          <span className="text-primary">Pocket</span>&nbsp;WinDryft Pro
         </h1>
         <button className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
           <span className="material-icons text-gray-500 dark:text-gray-400">menu</span>

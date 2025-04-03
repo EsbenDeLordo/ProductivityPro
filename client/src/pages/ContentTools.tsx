@@ -215,7 +215,7 @@ export default function ContentTools() {
               <CardHeader>
                 <CardTitle>Input Content</CardTitle>
                 <CardDescription>
-                  Paste your Huberman protocols or other content to summarize
+                  Paste your productivity protocols or research content to summarize
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -312,7 +312,7 @@ export default function ContentTools() {
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Paste Huberman protocols or any productivity content to get a concise summary</li>
+                <li>Paste productivity protocols or any research content to get a concise summary</li>
                 <li>Adjust the maximum length to control the detail level of your summary</li>
                 <li>Use the summarized content for quick reference or to share with your team</li>
                 <li>For best results, provide structured content with clear sections</li>
@@ -435,7 +435,7 @@ export default function ContentTools() {
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Extract key points from Huberman Lab protocols to identify actionable insights</li>
+                <li>Extract key points from productivity research to identify actionable insights</li>
                 <li>Adjust the number of points to get more or fewer details</li>
                 <li>Use the extracted points for creating to-do lists or action plans</li>
                 <li>Copy all points at once to easily transfer them to your note-taking system</li>

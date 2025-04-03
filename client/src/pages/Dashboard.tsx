@@ -7,6 +7,8 @@ import ProjectsList from "@/components/dashboard/ProjectsList";
 import WorkAnalytics from "@/components/dashboard/WorkAnalytics";
 import HubermanRecommendations from "@/components/dashboard/HubermanRecommendations";
 import AssistantChat from "@/components/dashboard/AssistantChat";
+import PomodoroTimer from "@/components/dashboard/PomodoroTimer";
+import DailyChecklist from "@/components/dashboard/DailyChecklist";
 
 export default function Dashboard() {
   const { theme, toggleTheme } = useTheme();
@@ -44,7 +46,13 @@ export default function Dashboard() {
       {/* Overview Cards */}
       <Overview />
       
-      {/* Projects and Recommendations */}
+      {/* First row: Pomodoro and Checklist */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
+        <PomodoroTimer />
+        <DailyChecklist />
+      </div>
+      
+      {/* Second row: Projects and Recommendations */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <ProjectsList />

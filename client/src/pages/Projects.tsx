@@ -16,7 +16,8 @@ import ProjectCard from "@/components/projects/ProjectCard";
 import ProjectDetail from "@/components/projects/ProjectDetail";
 
 export default function Projects() {
-  const { projects, isLoading } = useProjects();
+  const { projects = [], isLoading } = useProjects();
+  console.log('Projects:', projects); // Debug logging
   const [location, setLocation] = useLocation();
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [filter, setFilter] = useState("all");

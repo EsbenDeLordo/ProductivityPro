@@ -47,7 +47,10 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   });
 
   const createProject = async (project: Omit<Project, "id" | "createdAt" | "status" | "progress" | "files" | "timeLogged">) => {
-    return createProjectMutation.mutateAsync(project);
+    const result = await createProjectMutation.mutateAsync(project);
+    // Force refresh projects list
+    await queryClient.invalidateQueries({ queryKey: ['/api/projects', userId] });
+    return result;
   };
 
   const updateProject = async (id: number, project: Partial<Project>) => {

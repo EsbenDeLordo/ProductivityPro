@@ -37,7 +37,7 @@ export default function Projects() {
   });
   
   // Filter projects based on search and filter criteria
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = projects?.filter(project => {
     // Apply search filter
     const matchesSearch = 
       project.name.toLowerCase().includes(search.toLowerCase()) ||

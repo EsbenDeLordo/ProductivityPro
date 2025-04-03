@@ -39,17 +39,16 @@ export default function Sidebar({ user }: SidebarProps) {
         <ul className="space-y-1">
           {navigationItems.map((item) => (
             <li key={item.path}>
-              <Link href={item.path}>
-                <a 
-                  className={`flex items-center px-4 py-2 text-sm rounded-lg ${
-                    location === item.path 
-                      ? "bg-primary text-white" 
-                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <span className="material-icons mr-3">{item.icon}</span>
-                  {item.label}
-                </a>
+              <Link 
+                href={item.path}
+                className={`flex items-center px-4 py-2 text-sm rounded-lg ${
+                  location === item.path 
+                    ? "bg-primary text-white" 
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                <span className="material-icons mr-3">{item.icon}</span>
+                {item.label}
               </Link>
             </li>
           ))}
@@ -63,14 +62,15 @@ export default function Sidebar({ user }: SidebarProps) {
             <ul className="mt-2 space-y-1">
               {recentProjects.map((project) => (
                 <li key={project.id}>
-                  <Link href={`/projects?id=${project.id}`}>
-                    <a className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <span 
-                        className="w-2 h-2 mr-3 rounded-full" 
-                        style={{ backgroundColor: project.colorCode }}
-                      ></span>
-                      <span>{project.name}</span>
-                    </a>
+                  <Link 
+                    href={`/projects?id=${project.id}`}
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <span 
+                      className="w-2 h-2 mr-3 rounded-full" 
+                      style={{ backgroundColor: project.colorCode }}
+                    ></span>
+                    <span>{project.name}</span>
                   </Link>
                 </li>
               ))}

@@ -441,17 +441,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Content summarization route
   app.post("/api/summarize", async (req, res) => {
-    const { content, maxLength } = req.body;
+    const { content, maxLength, format, maxPoints } = req.body;
     
     if (!content) {
       return res.status(400).json({ message: "Content is required" });
     }
     
     try {
-      const summary = await summarizeContent(
-        content,
-        maxLength || 500
-      );
+      let summary;
+      
+      if (format === 'key_points') {
+        // Add instruction to format as key points in the actual call to OpenAI
+        summary = await summarizeContent(
+          `Extract the ${maxPoints || 5} most important key points from this content. Format as a numbered list with one key point per line:\n\n${content}`,
+          maxLength || 1000
+        );
+      } else {
+        summary = await summarizeContent(
+          content,
+          maxLength || 500
+        );
+      }
       
       res.json({ summary });
     } catch (error) {

@@ -47,7 +47,6 @@ type FormData = z.infer<typeof formSchema>;
 interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  editProject?: Project;
 }
 
 export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
@@ -142,12 +141,8 @@ export default function ProjectModal({ isOpen, onClose }: ProjectModalProps) {
               <span className="material-icons text-primary dark:text-blue-300">add_task</span>
             </div>
             <div>
-              <DialogTitle className="text-lg">
-                {editProject ? 'Edit Project' : 'Create New Project'}
-              </DialogTitle>
-              <DialogDescription>
-                {editProject ? 'Update project details' : 'Set up a new project with templates and AI assistance'}
-              </DialogDescription>
+              <DialogTitle className="text-lg">Create New Project</DialogTitle>
+              <DialogDescription>Set up a new project with templates and AI assistance</DialogDescription>
             </div>
           </div>
         </DialogHeader>

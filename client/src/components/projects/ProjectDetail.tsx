@@ -1,6 +1,3 @@
-
-import ProjectModal from "./ProjectModal";
-
 import { useState } from "react";
 import { Project, ProjectTemplate } from "@shared/schema";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -28,7 +25,6 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   const [activeTab, setActiveTab] = useState("overview");
   const [progress, setProgress] = useState(project.progress);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Project mutations
   const createProjectMutation = useMutation({
@@ -126,9 +122,6 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       if (isSessionActive && currentSession?.projectId === project.id) {
         if (currentSession.id) {
           await endSession();
-          // Fetch updated project data after ending session
-          const updatedProject = await apiRequest('GET', `/api/project/${project.id}`);
-          onUpdate(updatedProject);
           toast({
             title: "Session ended",
             description: "Your work session has been saved."
@@ -154,9 +147,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
 
   // Handle progress update
   const handleProgressUpdate = () => {
-    if (progress >= 0 && progress <= 100) {
-      updateProject({ progress });
-    }
+    updateProjectMutation.mutate({ progress });
   };
 
   // Handle message sending
@@ -512,7 +503,29 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
-                onClick={() => setIsEditModalOpen(true)}
+                onClick={async () => {
+                  try {
+                    if (!project.id) return;
+                    await updateProject({
+                      id: project.id,
+                      name: project.name,
+                      description: project.description,
+                      type: project.type,
+                      deadline: project.deadline || "",
+                      aiAssistanceEnabled: project.aiAssistanceEnabled
+                    });
+                    toast({
+                      title: "Project updated",
+                      description: "Changes have been saved successfully."
+                    });
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to update project",
+                      variant: "destructive"
+                    });
+                  }
+                }}
               >
                 <span className="material-icons mr-2">edit</span>
                 Edit Project
@@ -589,10 +602,3 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
     </div>
   );
 }
-
-      {/* Edit Project Modal */}
-      <ProjectModal 
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        editProject={project}
-      />

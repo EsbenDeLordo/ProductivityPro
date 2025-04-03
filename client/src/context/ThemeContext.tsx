@@ -18,9 +18,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    // Apply theme class to body
-    document.body.classList.remove("light-mode", "dark-mode");
-    document.body.classList.add(`${theme}-mode`);
+    // Apply theme class to html element (root) instead of body
+    document.documentElement.classList.remove("light-mode", "dark-mode");
+    document.documentElement.classList.add(`${theme}-mode`);
     
     // Save theme preference
     localStorage.setItem("theme", theme);

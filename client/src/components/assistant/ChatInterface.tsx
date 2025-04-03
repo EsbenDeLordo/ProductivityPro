@@ -377,7 +377,6 @@ export default function ChatInterface() {
                         <SelectItem value="auto">Auto (Use best available)</SelectItem>
                         <SelectItem value="deepseek">DeepSeek</SelectItem>
                         <SelectItem value="gemini">Gemini</SelectItem>
-                        <SelectItem value="anthropic">Claude (Anthropic)</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-gray-500">
@@ -406,13 +405,7 @@ export default function ChatInterface() {
                         placeholder="..." 
                       />
                     </div>
-                    <div className="space-y-2 mt-2">
-                      <label className="text-xs font-medium">Anthropic API Key</label>
-                      <Input 
-                        type="password" 
-                        placeholder="sk-ant-..." 
-                      />
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -427,8 +420,7 @@ export default function ChatInterface() {
                       description: `Using ${
                         selectedProvider === 'auto' ? 'Auto' : 
                         selectedProvider === 'deepseek' ? 'DeepSeek' : 
-                        selectedProvider === 'gemini' ? 'Gemini' :
-                        'Claude'
+                        'Gemini'
                       } as your AI provider. API keys must be configured on the server.`,
                     });
                     setIsApiKeyDialogOpen(false);
@@ -512,16 +504,12 @@ export default function ChatInterface() {
                                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
                                 : msg.provider === 'gemini'
                                 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                                : msg.provider === 'anthropic'
-                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
                                 : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                             }`}>
                               {msg.provider === 'deepseek' 
                                 ? 'DeepSeek' 
                                 : msg.provider === 'gemini' 
                                 ? 'Gemini'
-                                : msg.provider === 'anthropic'
-                                ? 'Claude' 
                                 : 'AI'}
                             </span>
                           </div>
@@ -578,16 +566,12 @@ export default function ChatInterface() {
                               ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
                               : selectedProvider === 'gemini'
                               ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                              : selectedProvider === 'anthropic'
-                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
                               : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
                           }`}>
                             {selectedProvider === 'deepseek' 
                               ? 'DeepSeek' 
                               : selectedProvider === 'gemini' 
                               ? 'Gemini' 
-                              : selectedProvider === 'anthropic'
-                              ? 'Claude'
                               : 'Auto'}
                           </span>
                         </div>

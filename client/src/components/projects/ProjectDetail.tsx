@@ -67,7 +67,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
   // Update project mutation
   const updateProjectMutation = useMutation({
     mutationFn: (data: Partial<Project>) => 
-      apiRequest('PUT', `/api/project/${project.id}`, data).then(res => res.json()),
+      apiRequest('PUT', `/api/project/${project.id}`, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/projects', project.userId] });
       queryClient.invalidateQueries({ queryKey: ['/api/project', project.id] });
@@ -78,6 +78,10 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
       });
     }
   });
+
+  const updateProject = (updatedData: Partial<Project>) => {
+    return updateProjectMutation.mutateAsync(updatedData);
+  };
 
   // Send message mutation
   const sendMessageMutation = useMutation({
@@ -121,8 +125,7 @@ export default function ProjectDetail({ project, onUpdate, onClose }: ProjectDet
           title: "Session ended",
           description: "Your work session has been saved."
         });
-      } else {
-        const now = new Date();
+      } else if (!isSessionActive) {
         await startSession(project.id, "focus");
         toast({
           title: "Session started",
